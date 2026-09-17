@@ -1,0 +1,528 @@
+{
+  "assets": [
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.02 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-008.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.01 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-005.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.01 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-006.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.01.jpeg",
+      "destination": "/assets/products/client-september/photo-007.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.02 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-009.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.02.jpeg",
+      "destination": "/assets/products/client-september/photo-010.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.03.jpeg",
+      "destination": "/assets/products/client-september/photo-011.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.04.jpeg",
+      "destination": "/assets/products/client-september/photo-012.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.05 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-013.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.05.jpeg",
+      "destination": "/assets/products/client-september/photo-015.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.15 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-043.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.15 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-044.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.16 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-046.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.16.jpeg",
+      "destination": "/assets/products/client-september/photo-048.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.06 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-016.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.05 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-014.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.06.jpeg",
+      "destination": "/assets/products/client-september/photo-017.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.07 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-018.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.07 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-019.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.07 (3).jpeg",
+      "destination": "/assets/products/client-september/photo-020.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.07.jpeg",
+      "destination": "/assets/products/client-september/photo-021.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.08 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-022.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.08 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-023.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.08.jpeg",
+      "destination": "/assets/products/client-september/photo-024.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.10 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-028.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.10 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-029.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.10.jpeg",
+      "destination": "/assets/products/client-september/photo-030.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.42.51.jpeg",
+      "destination": "/assets/products/client-september/photo-004.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.09 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-025.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.09 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-026.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.09.jpeg",
+      "destination": "/assets/products/client-september/photo-027.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.11.jpeg",
+      "destination": "/assets/products/client-september/photo-033.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.11 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-031.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.11 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-032.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.12 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-034.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.12 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-035.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.12.jpeg",
+      "destination": "/assets/products/client-september/photo-036.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.13 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-037.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.13 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-038.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.13.jpeg",
+      "destination": "/assets/products/client-september/photo-039.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.14 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-040.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.14 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-041.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.14.jpeg",
+      "destination": "/assets/products/client-september/photo-042.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.15.jpeg",
+      "destination": "/assets/products/client-september/photo-045.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.27 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-063.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.26 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-060.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.26 (3).jpeg",
+      "destination": "/assets/products/client-september/photo-061.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.27.jpeg",
+      "destination": "/assets/products/client-september/photo-064.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.28 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-065.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.28.jpeg",
+      "destination": "/assets/products/client-september/photo-067.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.29 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-068.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.29 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-069.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.29.jpeg",
+      "destination": "/assets/products/client-september/photo-070.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.30 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-071.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.30 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-072.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.30.jpeg",
+      "destination": "/assets/products/client-september/photo-073.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.31 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-074.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.31.jpeg",
+      "destination": "/assets/products/client-september/photo-076.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.32 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-077.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.28 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-066.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.31 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-075.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.32.jpeg",
+      "destination": "/assets/products/client-september/photo-079.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.26 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-059.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.26.jpeg",
+      "destination": "/assets/products/client-september/photo-062.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.32 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-078.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.39 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-095.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.39 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-096.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.40 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-098.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.40 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-099.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.40.jpeg",
+      "destination": "/assets/products/client-september/photo-100.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.41 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-101.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.41 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-102.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.41.jpeg",
+      "destination": "/assets/products/client-september/photo-103.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.42.jpeg",
+      "destination": "/assets/products/client-september/photo-107.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.34 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-083.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.33 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-080.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.33 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-081.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.33.jpeg",
+      "destination": "/assets/products/client-september/photo-082.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.34 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-084.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.34.jpeg",
+      "destination": "/assets/products/client-september/photo-085.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.35 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-086.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.35.jpeg",
+      "destination": "/assets/products/client-september/photo-087.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.36.jpeg",
+      "destination": "/assets/products/client-september/photo-088.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.37 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-089.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.37 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-090.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.37.jpeg",
+      "destination": "/assets/products/client-september/photo-091.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.38 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-092.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.38 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-093.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.38.jpeg",
+      "destination": "/assets/products/client-september/photo-094.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.39.jpeg",
+      "destination": "/assets/products/client-september/photo-097.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.17 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-050.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.17.jpeg",
+      "destination": "/assets/products/client-september/photo-051.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.18 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-052.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.18.jpeg",
+      "destination": "/assets/products/client-september/photo-053.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.44.19.jpeg",
+      "destination": "/assets/products/client-september/photo-054.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.42 (1).jpeg",
+      "destination": "/assets/products/client-september/photo-104.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.42 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-105.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.42 (3).jpeg",
+      "destination": "/assets/products/client-september/photo-106.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.43 (2).jpeg",
+      "destination": "/assets/products/client-september/photo-109.jpg"
+    },
+    {
+      "source": "WhatsApp Image 2026-09-18 at 00.45.43.jpeg",
+      "destination": "/assets/products/client-september/photo-110.jpg"
+    }
+  ],
+  "groups": {
+    "ivory-tulip-dress-x5014": [
+      8,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      13,
+      15,
+      43,
+      44,
+      46,
+      48
+    ],
+    "sage-babydoll-blouse-lx0063": [
+      16,
+      14,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      28,
+      29,
+      30
+    ],
+    "ivory-tulip-pants-x5013": [
+      4,
+      25,
+      26,
+      27,
+      16,
+      19,
+      21,
+      28
+    ],
+    "sage-tulip-dress-x5014": [
+      33,
+      31,
+      32,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      45
+    ],
+    "pink-floral-top-x5010": [
+      63,
+      60,
+      61,
+      64,
+      65,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      76,
+      77
+    ],
+    "embroidered-flower-shorts-x5011": [
+      66,
+      75,
+      79,
+      60,
+      61,
+      63,
+      64,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      77
+    ],
+    "pink-floral-collar-dress-x5008": [
+      59,
+      62,
+      78,
+      95,
+      96,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      107
+    ],
+    "pink-ruffle-bib-dress-x5009": [
+      83,
+      80,
+      81,
+      82,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      97
+    ]
+  }
+}
