@@ -54,6 +54,9 @@ export default function ProductGallery({ product }) {
   const showingFilm = index === filmIndex;
   const [expanded, setExpanded] = useState(false);
   const [zoom, setZoom] = useState(false);
+  // In-stage magnification, used wherever the side panel does not fit: a mouse
+  // on a narrow window, and every touch screen.
+  const [inline, setInline] = useState(false);
   const stage = useRef(null);
   const original = useRef(null);
   const lens = useRef(null);
@@ -61,12 +64,36 @@ export default function ProductGallery({ product }) {
   const zoomImage = useRef(null);
   const canZoom = useRef(false);
   const lastPointer = useRef(null);
+  // The side preview panel needs room beside the stage; below that the same
+  // magnification happens inside the stage instead.
   useEffect(() => {
-    const query = matchMedia('(min-width: 1000px) and (hover: hover) and (pointer: fine)');
-    const update = () => { canZoom.current = query.matches; setZoom(false); };
+    const query = matchMedia('(min-width: 1100px) and (hover: hover) and (pointer: fine)');
+    const update = () => { canZoom.current = query.matches; setZoom(false); resetInline(); };
     update(); query.addEventListener('change', update);
     return () => query.removeEventListener('change', update);
   }, []);
+  // Magnify about the pointer so the detail under it stays under it. Never past
+  // the photograph's own pixels — these are 750px catalog originals.
+  function magnify(event) {
+    const img = original.current, box = stage.current;
+    if(!img?.naturalWidth || !box) return false;
+    const bounds = box.getBoundingClientRect();
+    const fit = Math.min(bounds.width / img.naturalWidth, bounds.height / img.naturalHeight);
+    const scale = Math.min(2.6, 1 / fit);
+    if(scale <= 1.05) return false;
+    const x = clamp(event.clientX - bounds.left, 0, bounds.width);
+    const y = clamp(event.clientY - bounds.top, 0, bounds.height);
+    img.style.transformOrigin = `${x}px ${y}px`;
+    img.style.transform = `scale(${scale})`;
+    return true;
+  }
+  function resetInline() {
+    const img = original.current;
+    if(img) { img.style.transform = ''; img.style.transformOrigin = ''; }
+    setInline(false);
+  }
+  // Reset whenever the photograph changes.
+  useEffect(() => { resetInline(); }, [index]);
   // The stage element is replaced when the film is selected, so the observer is
   // re-attached to whichever stage is currently mounted.
   useEffect(() => {
@@ -79,7 +106,9 @@ export default function ProductGallery({ product }) {
   // no easing and doesn't re-render React. Letterboxing is explicitly excluded.
   function track(e) {
     lastPointer.current = {clientX:e.clientX,clientY:e.clientY,pointerType:e.pointerType};
-    if(!canZoom.current || e.pointerType !== 'mouse' || !original.current?.naturalWidth) return;
+    if(e.pointerType !== 'mouse') return;
+    if(!canZoom.current) { if(magnify(e)) setInline(true); return; }
+    if(!original.current?.naturalWidth) return;
     const bounds = stage.current.getBoundingClientRect();
     const img = original.current;
     const fit = Math.min(bounds.width / img.naturalWidth, bounds.height / img.naturalHeight);
@@ -107,12 +136,28 @@ export default function ProductGallery({ product }) {
     <div className="gallery-primary">
       {showingFilm
         ? <div className="product-stage product-stage-film"><video className="stage-film" controls autoPlay muted loop playsInline preload="auto" poster={imagePreview(images[0],960)} src={video} aria-label={`${product.name} film`} /></div>
-        : <button ref={stage} className="product-stage" aria-label={`Expand ${product.name} photograph`} onClick={() => { setZoom(false); setExpanded(true); }} onPointerMove={track} onPointerLeave={() => { lastPointer.current = null; setZoom(false); }}>
+        : <div ref={stage} className={`product-stage ${inline ? 'is-magnified' : ''}`}
+            onPointerMove={(event) => {
+              if(event.pointerType === 'mouse') { track(event); return; }
+              if(inline) magnify(event); // drag to explore while magnified
+            }}
+            onPointerLeave={(event) => {
+              // Touch fires pointerleave the moment the finger lifts, which would
+              // undo the tap; only a mouse leaving the stage should reset it.
+              if(event.pointerType !== 'mouse') return;
+              lastPointer.current = null; setZoom(false); resetInline();
+            }}
+            onPointerDown={(event) => {
+              if(event.pointerType === 'mouse') return;
+              // Tap to magnify at that point, tap again to step back out.
+              if(inline) resetInline();
+              else if(magnify(event)) setInline(true);
+            }}>
             <img ref={original} key={images[index]} className="primary-photograph" src={images[index]} alt={product.alt} fetchPriority="high" draggable="false" />
             <span ref={lens} className={`zoom-lens ${zoom ? 'is-active' : ''}`} aria-hidden="true" />
-            <span className="expand-image" aria-hidden="true">↗</span>
-          </button>}
-      <div className="gallery-caption"><span>{String(index + 1).padStart(2,'0')} / {String(count).padStart(2,'0')}</span>{showingFilm ? <span>{product.videoLabel || 'The piece in motion'}</span> : <><span className="desktop-zoom-copy">Hover to explore · Click to expand</span><span className="touch-zoom-copy">Tap to explore the details</span></>}</div>
+            <button type="button" className="expand-image" aria-label={`Open ${product.name} photograph full screen`} onClick={() => { setZoom(false); resetInline(); setExpanded(true); }}>↗</button>
+          </div>}
+      <div className="gallery-caption"><span>{String(index + 1).padStart(2,'0')} / {String(count).padStart(2,'0')}</span>{showingFilm ? <span>{product.videoLabel || 'The piece in motion'}</span> : <><span className="desktop-zoom-copy">Hover to zoom · ↗ for full screen</span><span className="touch-zoom-copy">{inline ? 'Drag to explore · tap to zoom out' : 'Tap the photo to zoom'}</span></>}</div>
       <div ref={preview} className={`zoom-preview ${zoom ? 'is-active' : ''}`} aria-hidden="true"><img ref={zoomImage} src={showingFilm ? images[0] : images[index]} alt="" /></div>
     </div>
     {expanded && !showingFilm && <ExpandedGallery product={product} images={images} initialIndex={index} onClose={() => setExpanded(false)} />}
