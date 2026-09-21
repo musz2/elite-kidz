@@ -6,6 +6,6 @@ The homepage pairs two supplied photographs in a restrained paper-like compositi
 
 PDP: compact thumbnail rail, object-contained original photo, real sizes and enquiry ordering. Desktop magnification shares one exact image-space rectangle between lens and preview. It accounts for letterboxing, clamps at the image edge, recalculates on resize and caps at original pixel resolution. At under 1000px or without a fine hover pointer, use the expanded native dialog, explicit zoom/double tap and touch scrolling. Never initialize a touch lens.
 
-Use native dialogs for search, bag, assistant and expanded galleries, with keyboard focus containment and Escape support. Keep touch targets at least 44px. If the existing assistant service is unconfigured, show the functional WhatsApp contact instead.
+Use native dialogs for search, bag and expanded galleries, with keyboard focus containment and Escape support. Keep touch targets at least 44px. The floating help control links directly to the real WhatsApp contact.
 
 Motion is limited to photo changes, a brief route entrance, bag feedback, hover affordances and the desktop hero. Reduced motion removes animation and parallax. Functional content is always visible by default. Do not mutate React text nodes to animate headings.

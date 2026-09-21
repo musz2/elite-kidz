@@ -1,10 +1,11 @@
 import { clientMedia } from './clientMedia.js';
-const sizes = ['1-2Y','2-3Y','3-4Y','4-5Y','5-6Y','6-7Y','7-8Y'];
+import { allSizes } from './sizes.js';
 const supplied = (slug, itemNumber, name, type, colour) => ({
-  id:slug, slug, itemNumber, name, collection:'Current edit', category:'Girls', type, colour, status:'Current edit', sizes:[...sizes],
-  detail:`Style ${itemNumber}. Sizes are shown in the supplied size chart; please confirm current availability with Elite Kidz on WhatsApp.`,
+  id:slug, slug, itemNumber, name, collection:'Current edit', category:'Girls', type, colour, status:'Current edit', sizes:[...allSizes],
+  detail:`Style ${itemNumber}. Measurements for every size are on the size guide; please confirm current availability with Elite Kidz on WhatsApp.`,
   images:clientMedia[slug], alt:name+' from Elite Kidz', tags:['Girls',type,colour,itemNumber],
-  sizeChart:'/assets/products/client-september/photo-054.jpg'
+  video:'/assets/products/client-september/tulip-collection.mp4', videoLabel:'Watch the tulip collection',
+  sizeChart:`#/size-guide?style=${itemNumber}`
 });
 export const newProducts = [
   {...supplied('sage-babydoll-blouse-lx0063','LX0063','Sage Sleeveless Babydoll Blouse','Top','Sage green'), material:'100% cotton', materialImage:'/assets/products/client-september/photo-050.jpg'},

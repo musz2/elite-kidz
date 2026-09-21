@@ -46,8 +46,12 @@ function ExpandedGallery({ product, images, initialIndex, onClose }) {
 
 export default function ProductGallery({ product }) {
   const images = galleryImages(product);
-  const video = product.video || (product.slug === "pink-floral-collar-dress-x5008" ? "/assets/products/client-september/pink-collection.mp4" : null);
+  const video = product.video || null;
+  // The film sits at the end of the thumbnail rail, after the photographs.
+  const filmIndex = video ? images.length : -1;
+  const count = images.length + (video ? 1 : 0);
   const [index, setIndex] = useState(0);
+  const showingFilm = index === filmIndex;
   const [expanded, setExpanded] = useState(false);
   const [zoom, setZoom] = useState(false);
   const stage = useRef(null);
@@ -61,10 +65,16 @@ export default function ProductGallery({ product }) {
     const query = matchMedia('(min-width: 1000px) and (hover: hover) and (pointer: fine)');
     const update = () => { canZoom.current = query.matches; setZoom(false); };
     update(); query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+  // The stage element is replaced when the film is selected, so the observer is
+  // re-attached to whichever stage is currently mounted.
+  useEffect(() => {
+    if(!stage.current) return;
     const observer = new ResizeObserver(() => { if(lastPointer.current) track(lastPointer.current); else setZoom(false); });
     observer.observe(stage.current);
-    return () => { query.removeEventListener('change', update); observer.disconnect(); };
-  }, []);
+    return () => observer.disconnect();
+  }, [showingFilm]);
   // The lens and preview use the same image-space rectangle. Pointer tracking has
   // no easing and doesn't re-render React. Letterboxing is explicitly excluded.
   function track(e) {
@@ -90,17 +100,21 @@ export default function ProductGallery({ product }) {
     setZoom(true);
   }
   return <div className="premium-gallery">
-    <div className="thumbnail-rail" aria-label="Product photographs">{images.map((src, i) => <button key={src} className={i === index ? 'active' : ''} aria-label={`Show ${product.name} image ${i + 1}`} aria-pressed={i === index} onClick={() => { setIndex(i); lastPointer.current = null; setZoom(false); }}><img src={imagePreview(src,160)} alt="" loading="lazy" /></button>)}</div>
-    <div className="gallery-primary">
-      <button ref={stage} className="product-stage" aria-label={`Expand ${product.name} photograph`} onClick={() => { setZoom(false); setExpanded(true); }} onPointerMove={track} onPointerLeave={() => { lastPointer.current = null; setZoom(false); }}>
-        <img ref={original} key={images[index]} className="primary-photograph" src={images[index]} alt={product.alt} fetchPriority="high" draggable="false" />
-        <span ref={lens} className={`zoom-lens ${zoom ? 'is-active' : ''}`} aria-hidden="true" />
-        <span className="expand-image" aria-hidden="true">↗</span>
-      </button>
-      <div className="gallery-caption"><span>{String(index + 1).padStart(2,'0')} / {String(images.length).padStart(2,'0')}</span><span className="desktop-zoom-copy">Hover to explore · Click to expand</span><span className="touch-zoom-copy">Tap to explore the details</span></div>
-      <div ref={preview} className={`zoom-preview ${zoom ? 'is-active' : ''}`} aria-hidden="true"><img ref={zoomImage} src={images[index]} alt="" /></div>
-      {video && <details className="gallery-film"><summary>{product.videoLabel || 'See the piece in motion'} <span>▶</span></summary><video controls playsInline preload="none" poster={imagePreview(images[0])} src={video} aria-label={`${product.name} video`} /></details>}
+    <div className="thumbnail-rail" aria-label="Product photographs">
+      {images.map((src, i) => <button key={src} className={i === index ? 'active' : ''} aria-label={`Show ${product.name} image ${i + 1}`} aria-pressed={i === index} onClick={() => { setIndex(i); lastPointer.current = null; setZoom(false); }}><img src={imagePreview(src,160)} alt="" loading="lazy" /></button>)}
+      {video && <button className={`thumbnail-film ${showingFilm ? 'active' : ''}`} aria-label={`Play the ${product.name} film`} aria-pressed={showingFilm} onClick={() => { setIndex(filmIndex); lastPointer.current = null; setZoom(false); }}><img src={imagePreview(images[0],160)} alt="" loading="lazy" /><span aria-hidden="true"><svg width="9" height="11" viewBox="0 0 9 11"><path d="M0 0v11l9-5.5z" fill="currentColor" /></svg></span></button>}
     </div>
-    {expanded && <ExpandedGallery product={product} images={images} initialIndex={index} onClose={() => setExpanded(false)} />}
+    <div className="gallery-primary">
+      {showingFilm
+        ? <div className="product-stage product-stage-film"><video className="stage-film" controls autoPlay muted loop playsInline preload="auto" poster={imagePreview(images[0],960)} src={video} aria-label={`${product.name} film`} /></div>
+        : <button ref={stage} className="product-stage" aria-label={`Expand ${product.name} photograph`} onClick={() => { setZoom(false); setExpanded(true); }} onPointerMove={track} onPointerLeave={() => { lastPointer.current = null; setZoom(false); }}>
+            <img ref={original} key={images[index]} className="primary-photograph" src={images[index]} alt={product.alt} fetchPriority="high" draggable="false" />
+            <span ref={lens} className={`zoom-lens ${zoom ? 'is-active' : ''}`} aria-hidden="true" />
+            <span className="expand-image" aria-hidden="true">↗</span>
+          </button>}
+      <div className="gallery-caption"><span>{String(index + 1).padStart(2,'0')} / {String(count).padStart(2,'0')}</span>{showingFilm ? <span>{product.videoLabel || 'The piece in motion'}</span> : <><span className="desktop-zoom-copy">Hover to explore · Click to expand</span><span className="touch-zoom-copy">Tap to explore the details</span></>}</div>
+      <div ref={preview} className={`zoom-preview ${zoom ? 'is-active' : ''}`} aria-hidden="true"><img ref={zoomImage} src={showingFilm ? images[0] : images[index]} alt="" /></div>
+    </div>
+    {expanded && !showingFilm && <ExpandedGallery product={product} images={images} initialIndex={index} onClose={() => setExpanded(false)} />}
   </div>;
 }

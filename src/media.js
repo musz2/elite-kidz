@@ -2,6 +2,9 @@ import { clientMedia } from "./data/clientMedia.js";
 // Presentation-only selection. The supplied catalog and original assets remain intact.
 // Some red/ivory catalog galleries mix group shots and other styles; show only
 // photographs visibly containing the selected piece.
+// Six photographs per piece: the lead shot plus five, and the film after them.
+export const GALLERY_LIMIT = 6;
+
 export function galleryImages(product) {
   const ranges = {
     X5671: n => n === 9 || (n >= 53 && n <= 71),
@@ -11,7 +14,7 @@ export function galleryImages(product) {
   };
   const accepts = ranges[product.itemNumber];
   const originals = accepts ? product.images.filter(src => accepts(Number(src.match(/source-(\d+)/)?.[1]))) : product.images;
-  return [...new Set([...originals, ...(clientMedia[product.slug] || [])])];
+  return [...new Set([...originals, ...(clientMedia[product.slug] || [])])].slice(0, GALLERY_LIMIT);
 }
 export function imagePreview(src, width = 480) {
   return `/assets/previews/${src.replace('/assets/products/', '').replace(/\.jpg$/, '')}-${width}.webp`;

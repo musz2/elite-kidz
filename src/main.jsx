@@ -5,6 +5,7 @@ import { MotionLayer } from "./motion";
 import { trapDialogFocus } from "./dialog";
 import ProductGallery from "./Gallery";
 import { galleryImages, imagePreview, cardImage } from "./media";
+import { formatSize, measurementsFor, orderSizes, sizeHeight, sizeScale } from "./data/sizes";
 import "./styles.css";
 import "./premium.css";
 
@@ -25,7 +26,6 @@ function Icon({ name, size = 20 }) {
     phone: <><path d="M7.1 4.5 9.2 4a1 1 0 0 1 1.1.6l1 2.5a1 1 0 0 1-.3 1.1l-1.2 1a12.5 12.5 0 0 0 5 5l1-1.2a1 1 0 0 1 1.1-.3l2.5 1a1 1 0 0 1 .6 1.1l-.5 2.1a1.5 1.5 0 0 1-1.5 1.2C11 18 6 13 4.8 6a1.5 1.5 0 0 1 1.2-1.5Z" /></>,
     mail: <><rect x="3.5" y="5.5" width="17" height="13" rx="1.5" /><path d="m4 7 8 6 8-6" /></>,
     menu: <><path d="M4 7h16" /><path d="M4 12h16" /><path d="M4 17h16" /></>,
-    sparkle: <><path d="m12 3 1.5 6.5L20 11l-6.5 1.5L12 19l-1.5-6.5L4 11l6.5-1.5L12 3Z" /><path d="m19 3 .5 2 1.5.5-1.5.5-.5 2-.5-2L17 5.5l1.5-.5.5-2Z" /></>,
     zoom: <><circle cx="10.8" cy="10.8" r="5.8" /><path d="m15.2 15.2 4.4 4.4" /><path d="M8.4 10.8h4.8" /><path d="M10.8 8.4v4.8" /></>,
   };
   return <svg {...common}>{paths[name]}</svg>;
@@ -65,7 +65,7 @@ function createWhatsAppUrl(items, directProduct, directSize, directQuantity) {
   list.forEach((item, index) => {
     lines.push(`${index + 1}. ${item.product.name}`);
     if (item.product.itemNumber) lines.push(`Style: ${item.product.itemNumber}`);
-    lines.push(`Size: ${item.size || "To confirm on WhatsApp"}`);
+    lines.push(`Size: ${item.size ? formatSize(item.size) : "To confirm on WhatsApp"}`);
     lines.push(`Qty: ${item.quantity}`);
     lines.push("");
   });
@@ -127,21 +127,113 @@ function ProductCard({ product, onQuickAsk, onAdd }) {
         {product.status === 'New arrival' && <span className="product-badge">New arrival</span>}
       </a>
       <button className="quick-add" onClick={() => setQuickOpen(v => !v)} aria-expanded={quickOpen} aria-label={`Quick add ${product.name}`}>{quickOpen ? 'Close' : 'Quick add'} <Icon name={quickOpen ? 'close' : 'plus'} size={16} /></button>
-      {quickOpen && <div className="quick-sizes"><p>Choose a size <span>Stock confirmed on WhatsApp</span></p><div>{product.sizes.map(size => <button key={size} onClick={() => { onAdd(product,1,size); setQuickOpen(false); }}>{size}</button>)}</div></div>}
+      {quickOpen && <div className="quick-sizes"><p>Choose a size <span>Cut to height · stock confirmed on WhatsApp</span></p><div>{product.sizes.map(size => <button key={size} onClick={() => { onAdd(product,1,size); setQuickOpen(false); }}><strong>{size}</strong><small>{sizeHeight(size)}</small></button>)}</div></div>}
     </div>
     <div className="product-meta"><div><p className="product-collection">{product.type} <span>{product.itemNumber}</span></p><h3><a href={`#/product/${product.slug}`}>{product.name}</a></h3><p className="product-colour">{product.colour}</p><p className="price-enquiry">Price on enquiry</p></div><button className="mini-whatsapp" aria-label={`Ask about ${product.name} on WhatsApp`} onClick={() => onQuickAsk(product)}><Icon name="whatsapp" size={18} /></button></div>
   </article>;
 }
 
+// Which piece is on screen, second by second, read off the cut itself. The
+// caption follows the film so the shopper can open whatever caught their eye.
+const HERO_CHAPTERS = [
+  { from: 0, slug: "blue-gingham-dress-x4991", note: "Bunnies and gingham" },
+  { from: 6, slug: "ivory-floral-collar-dress-x5671", note: "A hand-finished collar" },
+  { from: 9, slug: "red-ruffle-dress-x5672", note: "A little red joy" },
+  { from: 11.2, slug: "pink-floral-collar-dress-x5008", note: "Pink, out in the field" },
+  { from: 16.2, slug: "ivory-tulip-dress-x5014", note: "Tulips, stitched on" },
+  { from: 19.2, slug: "sage-tulip-dress-x5014", note: "A little green, a lot of joy" }
+];
+
+function chapterAt(time) {
+  let index = 0;
+  while (index + 1 < HERO_CHAPTERS.length && time >= HERO_CHAPTERS[index + 1].from) index += 1;
+  return index;
+}
+
+const HERO_FILM = {
+  desktop: "/assets/products/hero/highlight.mp4",
+  mobile: "/assets/products/hero/highlight-480.mp4",
+  posterDesktop: "/assets/products/hero/highlight-poster.webp",
+  posterMobile: "/assets/products/hero/highlight-poster-480.webp"
+};
+
+// One highlight film cut from the four collection videos: blue gingham, ivory
+// embroidery, the pink floral edit and the sage tulip set.
+function HeroFilm({ chapter, onChapter }) {
+  const video = useRef(null);
+  // Chosen once, before paint, so only one file is ever requested.
+  const [source] = useState(() => {
+    const small = typeof matchMedia === "function" && matchMedia("(max-width: 700px)").matches;
+    return { src: small ? HERO_FILM.mobile : HERO_FILM.desktop, poster: small ? HERO_FILM.posterMobile : HERO_FILM.posterDesktop };
+  });
+  const [reduced] = useState(() => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const [playing, setPlaying] = useState(!reduced);
+  useEffect(() => {
+    const el = video.current;
+    if (!el || reduced) return;
+    // Autoplay is refused by some mobile browsers until the element is on screen,
+    // and there is no reason to decode the film while the hero is scrolled past.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) el.play().catch(() => setPlaying(false));
+      else el.pause();
+    }, { threshold: 0.15 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [reduced]);
+  const piece = getProduct(HERO_CHAPTERS[chapter].slug);
+  const toggle = () => {
+    const el = video.current;
+    if (!el) return;
+    if (el.paused) el.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+    else { el.pause(); setPlaying(false); }
+  };
+  return <div className="hero-film">
+    <video ref={video} className="hero-film-video" src={source.src} poster={source.poster}
+      muted loop playsInline autoPlay={!reduced} preload={reduced ? "none" : "auto"}
+      disablePictureInPicture onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
+      onTimeUpdate={(event) => onChapter(chapterAt(event.currentTarget.currentTime))}
+      aria-label="Elite Kidz collection film — the blue gingham, ivory embroidery, pink floral and sage tulip edits" />
+    <a className="hero-film-caption" href={`#/product/${piece.slug}`} onClick={(event) => handleInternalNavigation(event, `product/${piece.slug}`)}>
+      <span className="hero-film-tag" key={piece.slug}><small>Now playing</small><strong>{piece.name}</strong></span>
+      <Icon name="arrow" size={17} />
+    </a>
+    <button type="button" className="hero-film-toggle" onClick={toggle} aria-label={playing ? "Pause the collection film" : "Play the collection film"}>
+      {playing ? <svg width="11" height="12" viewBox="0 0 11 12" aria-hidden="true"><rect x="0" y="0" width="3.4" height="12" fill="currentColor" /><rect x="7.6" y="0" width="3.4" height="12" fill="currentColor" /></svg>
+               : <svg width="11" height="12" viewBox="0 0 11 12" aria-hidden="true"><path d="M0 0v12l11-6z" fill="currentColor" /></svg>}
+    </button>
+  </div>;
+}
+
+// The still beside the film shows the same piece the film is on, so the two
+// always read as one look rather than two unrelated photographs.
+function HeroStill({ chapter }) {
+  const active = HERO_CHAPTERS[chapter];
+  const piece = getProduct(active.slug);
+  return <a className="hero-detail-photo" href={`#/product/${piece.slug}`} onClick={(event) => handleInternalNavigation(event, `product/${piece.slug}`)} aria-label={`${piece.name} — ${active.note}`}>
+    <span className="hero-detail-frame">
+      {HERO_CHAPTERS.map((entry, index) => <img key={entry.slug} src={imagePreview(cardImage(getProduct(entry.slug)))} alt="" aria-hidden="true" className={index === chapter ? "is-active" : undefined} />)}
+    </span>
+    <span className="hero-detail-note" key={active.slug}>{active.note} ↗</span>
+  </a>;
+}
+
+function HeroShowcase() {
+  const [chapter, setChapter] = useState(0);
+  return <div className="fashion-hero-images">
+    <HeroFilm chapter={chapter} onChapter={(next) => setChapter((current) => current === next ? current : next)} />
+    <HeroStill chapter={chapter} />
+    <span className="hero-image-note" aria-hidden="true">THE LITTLE THINGS</span>
+  </div>;
+}
+
 function Home({ onQuickAsk, onAdd }) {
-  const hero = products.find(p => p.slug === 'ivory-tulip-dress-x5014');
   const types = [...new Set(products.map(p => p.type))];
   const featureProducts = products.filter(p=>p.featured);
   return <main id="main-content">
     <section className="fashion-hero">
       <div className="fashion-hero-inner section-shell">
         <div className="fashion-hero-copy"><p className="hero-kicker">Elite Kidz · Kidswear, with character</p><h1>Made for<br /><em>little</em> stars<span className="hero-star" aria-hidden="true">✳</span></h1><p>Floral collars. Playful colours.<br />A little personality in every piece.</p><a className="button button-dark" href="#/shop">Explore the collection <Icon name="arrow" size={18} /></a><div className="hero-footnote"><span>Stylish. Comfy. So very them.</span><span>Hyderabad, India</span></div></div>
-        <div className="fashion-hero-images"><a className="hero-main-photo" href={`#/product/${hero.slug}`}><img src={imagePreview(cardImage(hero),960)} alt={hero.alt} fetchPriority="high" /><span>Ivory Tulip Dress <Icon name="arrow" size={18} /></span></a><a className="hero-detail-photo" href={`#/product/${products[12].slug}`}><img src={imagePreview(cardImage(products[12]))} alt={products[12].alt} /><span>A little green, a lot of joy ↗</span></a><span className="hero-image-note" aria-hidden="true">THE LITTLE THINGS</span></div>
+        <HeroShowcase />
       </div>
     </section>
     <div className="collection-nav section-shell"><span>Find their favourite</span>{types.map(type=><a key={type} href={`#/shop?type=${type}`}>{type === 'Dress' ? 'Dresses' : type === 'Top' ? 'Tops' : type} <Icon name="arrow" size={14}/></a>)}</div>
@@ -162,9 +254,9 @@ function SearchBar({ value, onChange, onClose }) {
 
 function Filters({ activeType, setActiveType, activeSize, setActiveSize, activeColour, setActiveColour }) {
   const typeNames=[...new Set(products.map(p=>p.type))];
-  const sizes=[...new Set(products.flatMap(p=>p.sizes))];
+  const sizes=orderSizes([...new Set(products.flatMap(p=>p.sizes))]);
   const colours=[...new Set(products.map(p=>p.colour))];
-  return <div className="catalog-filters"><div className="type-tabs" aria-label="Product type"><button className={!activeType?'active':''} aria-pressed={!activeType} onClick={()=>setActiveType('')}>All pieces</button>{typeNames.map(type=><button key={type} className={activeType===type?'active':''} aria-pressed={activeType===type} onClick={()=>setActiveType(type)}>{type==='Dress'?'Dresses':type==='Top'?'Tops':type}</button>)}</div><div className="filter-selects"><label>Size <select aria-label="Filter by size" value={activeSize} onChange={e=>setActiveSize(e.target.value)}><option value="">All sizes</option>{sizes.map(size=><option key={size}>{size}</option>)}</select></label><label>Colour <select aria-label="Filter by colour" value={activeColour} onChange={e=>setActiveColour(e.target.value)}><option value="">All colours</option>{colours.map(colour=><option key={colour}>{colour}</option>)}</select></label></div></div>;
+  return <div className="catalog-filters"><div className="type-tabs" aria-label="Product type"><button className={!activeType?'active':''} aria-pressed={!activeType} onClick={()=>setActiveType('')}>All pieces</button>{typeNames.map(type=><button key={type} className={activeType===type?'active':''} aria-pressed={activeType===type} onClick={()=>setActiveType(type)}>{type==='Dress'?'Dresses':type==='Top'?'Tops':type}</button>)}</div><div className="filter-selects"><label>Size <select aria-label="Filter by size" value={activeSize} onChange={e=>setActiveSize(e.target.value)}><option value="">All sizes</option>{sizes.map(size=><option key={size} value={size}>{size} · {sizeHeight(size)}</option>)}</select></label><label>Colour <select aria-label="Filter by colour" value={activeColour} onChange={e=>setActiveColour(e.target.value)}><option value="">All colours</option>{colours.map(colour=><option key={colour}>{colour}</option>)}</select></label></div></div>;
 }
 
 function Shop({ route, onQuickAsk, onAdd }) {
@@ -186,7 +278,7 @@ function ProductPage({ product, onAdd, onQuickAsk }) {
   const [quantity,setQuantity]=useState(1);
   const [selectedSize,setSelectedSize]=useState('');
   if(!product) return <NotFound/>;
-  return <main id="main-content" className="product-page section-shell"><nav className="breadcrumbs" aria-label="Breadcrumb"><a href="#/shop">The collection</a><span>/</span><a href={`#/shop?type=${product.type}`}>{product.type}</a><span>/</span><span>{product.name}</span></nav><div className="product-layout"><ProductGallery product={product}/><div className="product-info"><p className="eyebrow">{product.category} · {product.type} · {product.itemNumber}</p><h1>{product.name}</h1><p className="pdp-price">Price on enquiry</p>{product.description&&<p className="product-lede">{product.description}</p>}<div className="product-rule"/><p className="product-colour-label"><span>Colour</span> {product.colour}</p><div className="size-block"><div className="option-label"><span>Select a size</span><a href={product.sizeChart||'#/size-guide'} target={product.sizeChart?'_blank':undefined} rel="noreferrer">Size guide ↗</a></div><div className="size-options" role="group" aria-label={`Choose a size for ${product.name}`}>{product.sizes.map(size=><button key={size} className={selectedSize===size?'active':''} aria-pressed={selectedSize===size} onClick={()=>setSelectedSize(size)}>{size}</button>)}</div><p className="stock-note">Size availability confirmed on WhatsApp.</p></div><div className="quantity-block"><span className="option-label">Quantity</span><div className="quantity-control"><button disabled={quantity===1} aria-label="Decrease quantity" onClick={()=>setQuantity(q=>Math.max(1,q-1))}><Icon name="minus" size={16}/></button><span aria-live="polite">{quantity}</span><button aria-label="Increase quantity" onClick={()=>setQuantity(q=>q+1)}><Icon name="plus" size={16}/></button></div></div><div className="product-actions"><button className="button button-dark button-wide" disabled={!selectedSize} onClick={()=>onAdd(product,quantity,selectedSize)}><Icon name="bag" size={18}/>{selectedSize?'Add to bag':'Select a size to add'}</button><button className="button button-outline button-wide" onClick={()=>onQuickAsk(product,selectedSize,quantity)}><Icon name="whatsapp" size={18}/> Ask about this piece</button></div><p className="action-note">Your bag is an enquiry. We’ll confirm price, availability and delivery before you order.</p><div className="pdp-details">{product.detail&&<details><summary>About this piece <Icon name="plus" size={16}/></summary><p>Style {product.itemNumber}. {product.description || `${product.type} in ${product.colour.toLowerCase()}.`}</p></details>}{product.material&&<details><summary>Material <Icon name="plus" size={16}/></summary><p>{product.material}</p></details>}<details><summary>Ordering & delivery <Icon name="plus" size={16}/></summary><p>Choose your size and add your favourites to the bag. Continue on WhatsApp to confirm prices, stock and delivery with Elite Kidz.</p><a href="#/shipping-returns">Ordering information ↗</a></details></div></div></div><section className="related-products"><SectionHeading title="A few more little favourites" action="Explore the collection" onAction={()=>navigate('shop')}/><div className="product-grid">{products.filter(p=>p.id!==product.id).slice(0,4).map(p=><ProductCard key={p.id} product={p} onAdd={onAdd} onQuickAsk={onQuickAsk}/>)}</div></section></main>;
+  return <main id="main-content" className="product-page section-shell"><nav className="breadcrumbs" aria-label="Breadcrumb"><a href="#/shop">The collection</a><span>/</span><a href={`#/shop?type=${product.type}`}>{product.type}</a><span>/</span><span>{product.name}</span></nav><div className="product-layout"><ProductGallery product={product}/><div className="product-info"><p className="eyebrow">{product.category} · {product.type} · {product.itemNumber}</p><h1>{product.name}</h1><p className="pdp-price">Price on enquiry</p>{product.description&&<p className="product-lede">{product.description}</p>}<div className="product-rule"/><p className="product-colour-label"><span>Colour</span> {product.colour}</p><div className="size-block"><div className="option-label"><span>Select a size</span><a href={`#/size-guide?style=${product.itemNumber}`} onClick={event=>handleInternalNavigation(event,`size-guide?style=${product.itemNumber}`)}>Size guide ↗</a></div><div className="size-options" role="group" aria-label={`Choose a size for ${product.name}`}>{product.sizes.map(size=><button key={size} className={selectedSize===size?'active':''} aria-pressed={selectedSize===size} aria-label={`Size ${size}, for a height of ${sizeHeight(size)}`} onClick={()=>setSelectedSize(size)}><strong>{size}</strong><small>{sizeHeight(size)}</small></button>)}</div><p className="stock-note">Sizes are cut to the child&rsquo;s height &mdash; {product.sizes.length ? `${product.sizes[0]} fits ${sizeHeight(product.sizes[0])}` : "see the size guide"}. Availability is confirmed on WhatsApp.</p></div><div className="quantity-block"><span className="option-label">Quantity</span><div className="quantity-control"><button disabled={quantity===1} aria-label="Decrease quantity" onClick={()=>setQuantity(q=>Math.max(1,q-1))}><Icon name="minus" size={16}/></button><span aria-live="polite">{quantity}</span><button aria-label="Increase quantity" onClick={()=>setQuantity(q=>q+1)}><Icon name="plus" size={16}/></button></div></div><div className="product-actions"><button className="button button-dark button-wide" disabled={!selectedSize} onClick={()=>onAdd(product,quantity,selectedSize)}><Icon name="bag" size={18}/>{selectedSize?'Add to bag':'Select a size to add'}</button><button className="button button-outline button-wide" onClick={()=>onQuickAsk(product,selectedSize,quantity)}><Icon name="whatsapp" size={18}/> Ask about this piece</button></div><p className="action-note">Your bag is an enquiry. We’ll confirm price, availability and delivery before you order.</p><div className="pdp-details">{product.detail&&<details><summary>About this piece <Icon name="plus" size={16}/></summary><p>Style {product.itemNumber}. {product.description || `${product.type} in ${product.colour.toLowerCase()}.`}</p></details>}{product.material&&<details><summary>Material <Icon name="plus" size={16}/></summary><p>{product.material}</p></details>}<details><summary>Ordering & delivery <Icon name="plus" size={16}/></summary><p>Choose your size and add your favourites to the bag. Continue on WhatsApp to confirm prices, stock and delivery with Elite Kidz.</p><a href="#/shipping-returns">Ordering information ↗</a></details></div></div></div><section className="related-products"><SectionHeading title="A few more little favourites" action="Explore the collection" onAction={()=>navigate('shop')}/><div className="product-grid">{products.filter(p=>p.id!==product.id).slice(0,4).map(p=><ProductCard key={p.id} product={p} onAdd={onAdd} onQuickAsk={onQuickAsk}/>)}</div></section></main>;
 }
 
 function About() {
@@ -200,7 +292,7 @@ function Contact() {
 function Faq() {
   const questions = [
     ["How do I place an order?", "Choose a piece and size, add it to your bag, then continue on WhatsApp. We confirm availability and final details with you personally."],
-    ["What sizes are available?", "Sizes vary by piece. Each product page shows the size labels currently available for that item; message us on WhatsApp for final stock confirmation and fit guidance."],
+    ["What sizes are available?", "Our pieces run 2Y to 8Y, and each size is cut to a child's height — 2Y fits 90cm, 3Y fits 100cm, and so on in 10cm steps up to 8Y at 150cm. Each product page shows the sizes currently held for that piece, and the size guide lists the full garment measurements in centimetres."],
     ["How quickly will I hear back?", "We reply during our normal WhatsApp hours and confirm the next step as soon as possible."],
     ["Can I ask about a piece before ordering?", "Yes. Use the WhatsApp button on any product card or product page and we will help with size and styling questions."],
     ["Do you accept returns?", "Please contact us before ordering if you need help with fit. Return and exchange guidance is confirmed with you on WhatsApp before the order is finalised."]
@@ -209,9 +301,75 @@ function Faq() {
   return <main id="main-content" className="content-page section-shell"><div className="page-intro narrow"><p className="eyebrow">Good to know</p><h1>Questions, made<br /><em>a little easier.</em></h1><p>Everything you need to browse and order the current Elite Kidz edit with confidence.</p></div><div className="faq-list">{questions.map(([question, answer], index) => <div className={`faq-item ${openQuestion === index ? "is-open" : ""}`} key={question}><button aria-expanded={openQuestion === index} onClick={() => setOpenQuestion(openQuestion === index ? -1 : index)}><span>{question}</span><Icon name={openQuestion === index ? "minus" : "plus"} size={17} /></button>{openQuestion === index && <div className="faq-answer"><p>{answer}</p></div>}</div>)}</div><div className="page-cta"><p className="eyebrow">Still wondering?</p><h2>We’re just a message<br /><em>away.</em></h2><a className="button button-dark" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} /> Ask on WhatsApp</a></div></main>;
 }
 
-function SizeGuide() {
-  const sizes = [...new Set(products.flatMap((product) => product.sizes))];
-  return <main id="main-content" className="content-page section-shell"><div className="page-intro narrow"><p className="eyebrow">Find their fit</p><h1>The little<br /><em>size guide.</em></h1><p>The current edit is available in the sizes below. Exact fit guidance is confirmed with you on WhatsApp before the order is final.</p></div><div className="size-guide-wrap"><table className="size-guide"><caption>Current edit size range</caption><thead><tr><th scope="col">Size</th><th scope="col">Availability</th><th scope="col">Fit guidance</th></tr></thead><tbody>{sizes.map((size) => <tr key={size}><th scope="row">{size}</th><td>Current edit</td><td>Confirm with Elite Kidz</td></tr>)}</tbody></table></div><div className="size-notes"><div><p className="eyebrow">A better fit</p><h2>Measure without<br /><em>the fuss.</em></h2></div><ol><li>Tell us the child’s usual size and the piece you like.</li><li>Share any fit preference or measurements you already have.</li><li>If they are between sizes, message us and we will guide you piece by piece.</li></ol></div><a className="button button-dark" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} /> Ask about sizing</a></main>;
+function SizeGuide({ route }) {
+  const requested = route?.query.get("style") || "";
+  // One entry per style code that has a supplier measurement sheet.
+  const charted = useMemo(() => {
+    const seen = new Map();
+    products.forEach((product) => { if (measurementsFor(product.itemNumber) && !seen.has(product.itemNumber)) seen.set(product.itemNumber, product); });
+    return [...seen.values()];
+  }, []);
+  const pending = useMemo(() => {
+    const seen = new Map();
+    products.forEach((product) => { if (!measurementsFor(product.itemNumber) && !seen.has(product.itemNumber)) seen.set(product.itemNumber, product); });
+    return [...seen.values()];
+  }, []);
+  const [openStyle, setOpenStyle] = useState(() => (charted.some((p) => p.itemNumber === requested) ? requested : charted[0]?.itemNumber) || "");
+  useEffect(() => {
+    if (!requested || !charted.some((product) => product.itemNumber === requested)) return;
+    setOpenStyle(requested);
+    const target = document.getElementById(`style-${requested}`);
+    if (!target) return;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
+  }, [requested, charted]);
+  return <main id="main-content" className="content-page size-guide-page section-shell">
+    <div className="page-intro narrow"><p className="eyebrow">Find their fit</p><h1>The little<br /><em>size guide.</em></h1><p>Every Elite Kidz piece is cut to a child&rsquo;s height, so each age is also a centimetre size. Start with the height, then check the garment measurements for the style you like.</p></div>
+
+    <section className="size-scale-block">
+      <div className="size-guide-wrap">
+        <table className="size-guide">
+          <caption>How the sizes run</caption>
+          <thead><tr><th scope="col">Size</th><th scope="col">Age</th><th scope="col">Child&rsquo;s height</th><th scope="col">Supplier label</th></tr></thead>
+          <tbody>{sizeScale.map((size) => <tr key={size.key}><th scope="row">{size.key}</th><td>{size.age}</td><td><b>{size.height}cm</b></td><td>{size.band}</td></tr>)}</tbody>
+        </table>
+      </div>
+      <p className="size-scale-note">Not every style is cut in all seven sizes. The sizes shown on a product page are the ones currently held &mdash; we confirm availability with you on WhatsApp before the order is final.</p>
+    </section>
+
+    <section className="style-measurements">
+      <div className="section-heading"><div><p className="eyebrow">Garment measurements</p><h2>Measured flat,<br /><em>style by style.</em></h2></div></div>
+      <p className="measurement-lede">All figures are centimetres, taken from the supplier&rsquo;s size sheet for that style. &ldquo;&frac12; chest&rdquo; is the garment measured flat across, so double it for the full circumference.</p>
+      <div className="style-charts">{charted.map((product) => {
+        const chart = measurementsFor(product.itemNumber);
+        const open = openStyle === product.itemNumber;
+        return <section key={product.itemNumber} id={`style-${product.itemNumber}`} className={`style-chart ${open ? "is-open" : ""}`}>
+          <h3><button type="button" aria-expanded={open} onClick={() => setOpenStyle(open ? "" : product.itemNumber)}>
+            <span className="style-chart-name">{product.name}<small>{product.itemNumber} · {product.type}</small></span>
+            <Icon name={open ? "minus" : "plus"} size={17} />
+          </button></h3>
+          {open && <div className="size-guide-wrap">
+            <p className="scroll-hint">Scroll sideways for every measurement →</p>
+            <table className="size-guide">
+              <caption>{product.itemNumber} measurements &mdash; centimetres</caption>
+              <thead><tr><th scope="col">Size</th><th scope="col">Height</th>{chart.columns.map((column) => <th key={column} scope="col">{column}</th>)}<th scope="col">Availability</th></tr></thead>
+              <tbody>{sizeScale.map((size, row) => <tr key={size.key} className={product.sizes.includes(size.key) ? "" : "size-row-unstocked"}>
+                <th scope="row">{size.key}</th>
+                <td>{size.height}cm</td>
+                {chart.columns.map((column, cell) => <td key={column}>{chart.rows[row][cell] ?? "—"}</td>)}
+                <td>{product.sizes.includes(size.key) ? "Current edit" : "Ask on WhatsApp"}</td>
+              </tr>)}</tbody>
+            </table>
+            <a className="text-link" href={`#/product/${product.slug}`} onClick={(event) => handleInternalNavigation(event, `product/${product.slug}`)}>See {product.name} <Icon name="arrow" size={16} /></a>
+          </div>}
+        </section>;
+      })}</div>
+      {!!pending.length && <p className="measurement-pending">Detailed sheets for {pending.map((product) => product.itemNumber).join(", ")} are being added. For now, use the height scale above &mdash; or message us and we will measure the piece for you.</p>}
+    </section>
+
+    <div className="size-notes"><div><p className="eyebrow">A better fit</p><h2>Measure without<br /><em>the fuss.</em></h2></div><ol><li>Measure the child&rsquo;s height, then take the nearest size up on the scale above.</li><li>Compare the garment length and &frac12; chest with something that already fits them well.</li><li>If they are between sizes, message us and we will guide you piece by piece.</li></ol></div>
+    <a className="button button-dark" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer"><Icon name="whatsapp" size={18} /> Ask about sizing</a>
+  </main>;
 }
 
 function ShippingReturns() {
@@ -222,61 +380,20 @@ function CartDrawer({ items, onClose, onUpdate, onRemove, onOrder }) {
   const dialog = useRef(null);
   useEffect(() => { const prior=document.activeElement; const old=document.body.style.overflow; document.body.style.overflow='hidden'; dialog.current.showModal(); return () => { dialog.current?.close(); document.body.style.overflow=old; prior?.focus(); }; }, []);
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
-  return <dialog onKeyDown={trapDialogFocus} ref={dialog} className="drawer-layer" onCancel={onClose} aria-label="Shopping bag"><button className="drawer-backdrop" tabIndex={-1} aria-label="Close bag" onClick={onClose} /><aside className="cart-drawer"><div className="drawer-header"><div><p className="eyebrow">Your selection</p><h2>Shopping bag <span>{count}</span></h2></div><button className="icon-button" onClick={onClose} aria-label="Close bag"><Icon name="close" /></button></div>{items.length ? <><div className="cart-items">{items.map((item) => <div className="cart-item" key={`${item.product.id}-${item.size}`}><img src={item.product.images[0]} alt={item.product.alt} /><div className="cart-item-copy"><h3>{item.product.name}</h3><p>{item.product.colour}</p><p>Size: {item.size}</p><p>Price on enquiry</p><div className="cart-item-bottom"><div className="quantity-control small"><button onClick={() => onUpdate(item, item.quantity - 1)} aria-label="Decrease quantity"><Icon name="minus" size={14} /></button><span>{item.quantity}</span><button onClick={() => onUpdate(item, item.quantity + 1)} aria-label="Increase quantity"><Icon name="plus" size={14} /></button></div><button className="remove-link" onClick={() => onRemove(item)}>Remove</button></div></div></div>)}</div><div className="cart-footer"><p className="cart-note">Size availability and final order details are confirmed directly on WhatsApp.</p><button className="button button-dark button-wide" onClick={onOrder}><Icon name="whatsapp" size={18} /> Enquire on WhatsApp</button></div></> : <div className="empty-cart"><Icon name="bag" size={30} /><h3>Your bag is waiting.</h3><p>Start with a piece from the current collection.</p><a className="button button-outline" href="#/shop" onClick={onClose}>Explore the collection</a></div>}</aside></dialog>;
+  return <dialog onKeyDown={trapDialogFocus} ref={dialog} className="drawer-layer" onCancel={onClose} aria-label="Shopping bag"><button className="drawer-backdrop" tabIndex={-1} aria-label="Close bag" onClick={onClose} /><aside className="cart-drawer"><div className="drawer-header"><div><p className="eyebrow">Your selection</p><h2>Shopping bag <span>{count}</span></h2></div><button className="icon-button" onClick={onClose} aria-label="Close bag"><Icon name="close" /></button></div>{items.length ? <><div className="cart-items">{items.map((item) => <div className="cart-item" key={`${item.product.id}-${item.size}`}><img src={item.product.images[0]} alt={item.product.alt} /><div className="cart-item-copy"><h3>{item.product.name}</h3><p>{item.product.colour}</p><p>Size: {formatSize(item.size)}</p><p>Price on enquiry</p><div className="cart-item-bottom"><div className="quantity-control small"><button onClick={() => onUpdate(item, item.quantity - 1)} aria-label="Decrease quantity"><Icon name="minus" size={14} /></button><span>{item.quantity}</span><button onClick={() => onUpdate(item, item.quantity + 1)} aria-label="Increase quantity"><Icon name="plus" size={14} /></button></div><button className="remove-link" onClick={() => onRemove(item)}>Remove</button></div></div></div>)}</div><div className="cart-footer"><p className="cart-note">Size availability and final order details are confirmed directly on WhatsApp.</p><button className="button button-dark button-wide" onClick={onOrder}><Icon name="whatsapp" size={18} /> Enquire on WhatsApp</button></div></> : <div className="empty-cart"><Icon name="bag" size={30} /><h3>Your bag is waiting.</h3><p>Start with a piece from the current collection.</p><a className="button button-outline" href="#/shop" onClick={onClose}>Explore the collection</a></div>}</aside></dialog>;
 }
 
-function AssistantPanel({ open, onOpen, onClose }) {
-  const [available, setAvailable] = useState(false);
-  useEffect(() => { const controller = new AbortController(); fetch('/api/assistant/status', {signal:controller.signal}).then(r => r.ok ? r.json() : null).then(data => setAvailable(data?.available === true)).catch(() => {}); return () => controller.abort(); }, []);
-  const dialog = useRef(null);
-  const [messages, setMessages] = useState([{ role: "assistant", content: "Hi, I’m Astra. I can help you find a piece, compare styles, or check the sizes shown in our current edit." }]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    const oldOverflow=document.body.style.overflow; document.body.style.overflow='hidden'; dialog.current.showModal();
-    const focusInput = window.setTimeout(() => document.getElementById("assistant-input")?.focus(), 0);
-    const closeOnEscape = (event) => { if (event.key === "Escape") onClose(); };
-    window.addEventListener("keydown", closeOnEscape);
-    return () => { dialog.current?.close(); document.body.style.overflow=oldOverflow; window.clearTimeout(focusInput); window.removeEventListener("keydown", closeOnEscape); };
-  }, [open, onClose]);
-
-  const sendMessage = async (event) => {
-    event.preventDefault();
-    const text = input.trim();
-    if (!text || loading) return;
-    const nextMessages = [...messages, { role: "user", content: text }];
-    setMessages(nextMessages);
-    setInput("");
-    setLoading(true);
-    try {
-      const response = await fetch("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: nextMessages }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error("Astra is unavailable right now. Please contact Elite Kidz on WhatsApp at +91 77024 26007 for help.");
-      setMessages((current) => [...current, { role: "assistant", content: data.message }]);
-    } catch (error) {
-      setMessages((current) => [...current, { role: "assistant", content: error.message }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!available) return <a className="assistant-launcher" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" aria-label="Ask Elite Kidz on WhatsApp"><Icon name="whatsapp" size={18}/><span>Ask Elite Kidz</span></a>;
-  return <>
-    <button className="assistant-launcher" onClick={onOpen} aria-label="Open Astra shopping assistant"><Icon name="sparkle" size={18} /><span>Ask Astra</span></button>
-    {open && <dialog onKeyDown={trapDialogFocus} ref={dialog} className="assistant-layer" aria-label="Astra shopping assistant" onCancel={onClose}><button className="assistant-backdrop" tabIndex={-1} aria-label="Close Astra assistant" onClick={onClose} /><aside className="assistant-panel" role="dialog" aria-modal="true" aria-labelledby="assistant-title"><div className="assistant-header"><div><p className="eyebrow">Elite Kidz assistant</p><h2 id="assistant-title">Ask Astra</h2></div><button className="icon-button" onClick={onClose} aria-label="Close assistant"><Icon name="close" /></button></div><div className="assistant-messages" aria-live="polite">{messages.map((message, index) => <div className={`assistant-message ${message.role}`} key={`${message.role}-${index}`}><span className="assistant-message-label">{message.role === "assistant" ? "Astra" : "You"}</span><p>{message.content}</p></div>)}{loading && <div className="assistant-message assistant"><span className="assistant-message-label">Astra</span><p className="assistant-typing">Thinking<span>·</span><span>·</span><span>·</span></p></div>}</div><div className="assistant-prompts"><button onClick={() => setInput("Which dress would you recommend for a special day?")}>Recommend a dress</button><button onClick={() => setInput("What sizes are available?")}>Check sizes</button></div><form className="assistant-composer" onSubmit={sendMessage}><input id="assistant-input" value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask about the collection" aria-label="Ask Astra about the collection" /><button className="button button-dark" disabled={loading || !input.trim()} aria-label="Send message"><Icon name="arrow" size={17} /></button></form><p className="assistant-footnote">Astra can help with the catalog. Final availability and orders are confirmed on WhatsApp.</p></aside></dialog>}
-  </>;
+// A direct line to Elite Kidz. Orders and size availability are confirmed by a
+// person on WhatsApp, so the floating action goes straight there.
+function WhatsAppLauncher() {
+  return <a className="whatsapp-launcher" href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" aria-label="Ask Elite Kidz on WhatsApp"><Icon name="whatsapp" size={18} /><span>Ask Elite Kidz</span></a>;
 }
-
-function NotFound() { return <main id="main-content" className="not-found section-shell"><p className="eyebrow">Page not found</p><h1>That little page<br /><em>has wandered off.</em></h1><a className="button button-dark" href="#/">Back to Elite Kidz</a></main>; }
 
 function App() {
   const route = useHashRoute();
   const [cart, setCart] = useState(() => { try { const saved=JSON.parse(localStorage.getItem("elite-kidz-cart") || "[]"); return Array.isArray(saved) ? saved.flatMap(item=>{ const product=products.find(p=>p.id===item.product?.id); return product && product.sizes.includes(item.size) && Number.isInteger(item.quantity) && item.quantity>0 ? [{product,size:item.size,quantity:item.quantity}] : []; }) : []; } catch { return []; } });
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [assistantOpen, setAssistantOpen] = useState(false);
   const [search, setSearch] = useState("");
   useEffect(() => { try { localStorage.setItem("elite-kidz-cart", JSON.stringify(cart)); } catch {} }, [cart]);
   useEffect(() => { document.title = route.page === "product" && getProduct(route.slug) ? `${getProduct(route.slug).name} — Elite Kidz` : route.page === "shop" ? "Shop — Elite Kidz" : route.page === "faq" ? "FAQ — Elite Kidz" : route.page === "size-guide" ? "Size Guide — Elite Kidz" : route.page === "shipping-returns" ? "Shipping & Returns — Elite Kidz" : "Elite Kidz — Made for Little Stars"; }, [route]);
@@ -285,8 +402,8 @@ function App() {
   const addToCart = (product, quantity = 1, size) => { if (!product.sizes.includes(size)) return; setCart((current) => { const key = `${product.id}-${size}`; const found = current.find((item) => `${item.product.id}-${item.size}` === key); return found ? current.map((item) => `${item.product.id}-${item.size}` === key ? { ...item, quantity: item.quantity + quantity } : item) : [...current, { product, size, quantity }]; }); setCartOpen(true); };
   const updateCart = (item, quantity) => setCart((current) => quantity < 1 ? current.filter((entry) => entry !== item) : current.map((entry) => entry === item ? { ...entry, quantity } : entry));
   const removeCart = (item) => setCart((current) => current.filter((entry) => entry !== item));
-  const page = route.page === "home" ? <Home onQuickAsk={openWhatsApp} onAdd={addToCart} /> : route.page === "shop" ? <Shop key={route.query.toString()} route={route} onQuickAsk={openWhatsApp} onAdd={addToCart} /> : route.page === "product" ? <ProductPage key={route.slug} product={getProduct(route.slug)} onAdd={addToCart} onQuickAsk={openWhatsApp} /> : route.page === "about" ? <About /> : route.page === "contact" ? <Contact /> : route.page === "faq" ? <Faq /> : route.page === "size-guide" ? <SizeGuide /> : route.page === "shipping-returns" ? <ShippingReturns /> : <NotFound />;
-  return <><a className="skip-link" href="#main-content">Skip to content</a><MotionLayer /><Header cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenSearch={() => setSearchOpen(true)} />{searchOpen && <SearchBar value={search} onChange={setSearch} onClose={() => { setSearchOpen(false); setSearch(""); }} />}{page}<Footer />{cartOpen && <CartDrawer items={cart} onClose={() => setCartOpen(false)} onUpdate={updateCart} onRemove={removeCart} onOrder={() => openWhatsApp()} />}<AssistantPanel open={assistantOpen} onOpen={() => setAssistantOpen(true)} onClose={() => setAssistantOpen(false)} /></>;
+  const page = route.page === "home" ? <Home onQuickAsk={openWhatsApp} onAdd={addToCart} /> : route.page === "shop" ? <Shop key={route.query.toString()} route={route} onQuickAsk={openWhatsApp} onAdd={addToCart} /> : route.page === "product" ? <ProductPage key={route.slug} product={getProduct(route.slug)} onAdd={addToCart} onQuickAsk={openWhatsApp} /> : route.page === "about" ? <About /> : route.page === "contact" ? <Contact /> : route.page === "faq" ? <Faq /> : route.page === "size-guide" ? <SizeGuide route={route} /> : route.page === "shipping-returns" ? <ShippingReturns /> : <NotFound />;
+  return <><a className="skip-link" href="#main-content">Skip to content</a><MotionLayer /><Header cartCount={cartCount} onOpenCart={() => setCartOpen(true)} onOpenSearch={() => setSearchOpen(true)} />{searchOpen && <SearchBar value={search} onChange={setSearch} onClose={() => { setSearchOpen(false); setSearch(""); }} />}{page}<Footer />{cartOpen && <CartDrawer items={cart} onClose={() => setCartOpen(false)} onUpdate={updateCart} onRemove={removeCart} onOrder={() => openWhatsApp()} />}<WhatsAppLauncher /></>;
 }
 
 window.addEventListener("load", () => { if (!window.location.hash) window.location.hash = "#/"; });

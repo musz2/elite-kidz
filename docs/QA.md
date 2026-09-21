@@ -16,7 +16,7 @@ Verified in rendered Chromium desktop and touch emulation:
 - Reduced-motion behaviour. No unexpected browser console errors or uncaught exceptions.
 - Screenshots reviewed for homepage, listing, PDP, zoom corners, mobile gallery, mobile search and bag. Local evidence and machine-readable results are in ignored `work/qa/`.
 
-The store still confirms prices, availability and delivery personally on WhatsApp; there is no invented checkout payment or live stock system. The optional Astra backend is unconfigured in this workspace, so the floating help control links directly to the real WhatsApp contact. The health endpoint only exposes a boolean, never a key.
+The store still confirms prices, availability and delivery personally on WhatsApp; there is no invented checkout payment or live stock system. The floating help control links directly to the real WhatsApp contact. The site ships no AI assistant and calls no third-party model API.
 
 Image derivatives are committed. To regenerate after adding genuine photos, install/use Sharp and run `node scripts/image-previews.mjs` (`SHARP_MODULE` may point to an existing installation).
 
