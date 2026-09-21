@@ -1,20 +1,24 @@
 // The Elite Kidz size scale.
 //
-// Every piece in the catalog is sold on one age scale. The supplied supplier
-// charts label their rows by age band ("1-2Y"), while the stock sheets label the
-// same garments by body height in centimetres ("90cm"). They are the same scale:
-// 2Y is the 90cm height, 3Y is 100cm, and so on up to 8Y at 150cm.
+// Every piece in the catalog is sold on one age scale. The supplier's size sheets
+// label their rows by age band ("1-2Y"); the supplier's proforma invoice pairs
+// each garment size with both — "90CM(2-3Y)", "140CM(7-8Y)". The invoice is the
+// document that ties the two together, so this scale follows it: the 1-2Y band is
+// the 80cm size, 2-3Y is 90cm, up to 7-8Y at 140cm, plus a 150cm the invoice
+// lists without a band. The year shown to shoppers is the lower age of the band,
+// which is how the client refers to them ("2 year 90 cm").
 //
 // `key` is what is stored in the bag and sent to WhatsApp. `height` is the child's
 // body height the size is cut for — the centimetre figure shoppers ask for.
 export const sizeScale = [
-  { key: "2Y", age: "1–2 years", band: "1-2Y", height: 90 },
-  { key: "3Y", age: "2–3 years", band: "2-3Y", height: 100 },
-  { key: "4Y", age: "3–4 years", band: "3-4Y", height: 110 },
-  { key: "5Y", age: "4–5 years", band: "4-5Y", height: 120 },
-  { key: "6Y", age: "5–6 years", band: "5-6Y", height: 130 },
-  { key: "7Y", age: "6–7 years", band: "6-7Y", height: 140 },
-  { key: "8Y", age: "7–8 years", band: "7-8Y", height: 150 }
+  { key: "1Y", age: "1–2 years", band: "1-2Y", height: 80 },
+  { key: "2Y", age: "2–3 years", band: "2-3Y", height: 90 },
+  { key: "3Y", age: "3–4 years", band: "3-4Y", height: 100 },
+  { key: "4Y", age: "4–5 years", band: "4-5Y", height: 110 },
+  { key: "5Y", age: "5–6 years", band: "5-6Y", height: 120 },
+  { key: "6Y", age: "6–7 years", band: "6-7Y", height: 130 },
+  { key: "7Y", age: "7–8 years", band: "7-8Y", height: 140 },
+  { key: "8Y", age: "8–9 years", band: "", height: 150 }
 ];
 
 export const allSizes = sizeScale.map((size) => size.key);
@@ -42,8 +46,10 @@ export function orderSizes(keys) {
 }
 
 // Garment measurements exactly as printed on the supplier size sheets supplied by
-// the client. Values are centimetres, in scale order (2Y first). A `null` column
-// value is a measurement the sheet does not give for that style.
+// the client. Values are centimetres, in scale order — the sheets' first row is
+// the 1-2Y band, which is the 80cm (1Y) size, so rows line up with `sizeScale`
+// from its first entry. The sheets stop at 7-8Y, so the 150cm size has no row.
+// A `null` column value is a measurement the sheet does not give for that style.
 // Source: /assets/products/client-september/photo-054.jpg and photo-110.jpg
 const chart = (columns, rows) => ({ columns, rows });
 

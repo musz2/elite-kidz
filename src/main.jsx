@@ -292,7 +292,7 @@ function Contact() {
 function Faq() {
   const questions = [
     ["How do I place an order?", "Choose a piece and size, add it to your bag, then continue on WhatsApp. We confirm availability and final details with you personally."],
-    ["What sizes are available?", "Our pieces run 2Y to 8Y, and each size is cut to a child's height — 2Y fits 90cm, 3Y fits 100cm, and so on in 10cm steps up to 8Y at 150cm. Each product page shows the sizes currently held for that piece, and the size guide lists the full garment measurements in centimetres."],
+    ["What sizes are available?", "Our pieces run 1Y to 8Y, and each size is cut to a child's height — 1Y fits 80cm, 2Y fits 90cm, and so on in 10cm steps up to 8Y at 150cm. Each product page shows the sizes the supplier makes that piece in, and the size guide lists the full garment measurements in centimetres."],
     ["How quickly will I hear back?", "We reply during our normal WhatsApp hours and confirm the next step as soon as possible."],
     ["Can I ask about a piece before ordering?", "Yes. Use the WhatsApp button on any product card or product page and we will help with size and styling questions."],
     ["Do you accept returns?", "Please contact us before ordering if you need help with fit. Return and exchange guidance is confirmed with you on WhatsApp before the order is finalised."]
@@ -324,14 +324,14 @@ function SizeGuide({ route }) {
     target.scrollIntoView({ block: "center", behavior: reduced ? "auto" : "smooth" });
   }, [requested, charted]);
   return <main id="main-content" className="content-page size-guide-page section-shell">
-    <div className="page-intro narrow"><p className="eyebrow">Find their fit</p><h1>The little<br /><em>size guide.</em></h1><p>Every Elite Kidz piece is cut to a child&rsquo;s height, so each age is also a centimetre size. Start with the height, then check the garment measurements for the style you like.</p></div>
+    <div className="page-intro narrow"><p className="eyebrow">Find their fit</p><h1>The little<br /><em>size guide.</em></h1><p>Every Elite Kidz piece is cut to a child&rsquo;s height, so each age is also a centimetre size &mdash; 2Y is the 90cm size. Start with the height, then check the garment measurements for the style you like.</p></div>
 
     <section className="size-scale-block">
       <div className="size-guide-wrap">
         <table className="size-guide">
           <caption>How the sizes run</caption>
-          <thead><tr><th scope="col">Size</th><th scope="col">Age</th><th scope="col">Child&rsquo;s height</th><th scope="col">Supplier label</th></tr></thead>
-          <tbody>{sizeScale.map((size) => <tr key={size.key}><th scope="row">{size.key}</th><td>{size.age}</td><td><b>{size.height}cm</b></td><td>{size.band}</td></tr>)}</tbody>
+          <thead><tr><th scope="col">Size</th><th scope="col">Age</th><th scope="col">Child&rsquo;s height</th><th scope="col">Supplier size</th></tr></thead>
+          <tbody>{sizeScale.map((size) => <tr key={size.key}><th scope="row">{size.key}</th><td>{size.age}</td><td><b>{size.height}cm</b></td><td>{size.band ? `${size.height}CM (${size.band})` : `${size.height}CM`}</td></tr>)}</tbody>
         </table>
       </div>
       <p className="size-scale-note">Not every style is cut in all seven sizes. The sizes shown on a product page are the ones currently held &mdash; we confirm availability with you on WhatsApp before the order is final.</p>
@@ -339,7 +339,7 @@ function SizeGuide({ route }) {
 
     <section className="style-measurements">
       <div className="section-heading"><div><p className="eyebrow">Garment measurements</p><h2>Measured flat,<br /><em>style by style.</em></h2></div></div>
-      <p className="measurement-lede">All figures are centimetres, taken from the supplier&rsquo;s size sheet for that style. &ldquo;&frac12; chest&rdquo; is the garment measured flat across, so double it for the full circumference.</p>
+      <p className="measurement-lede">All figures are centimetres, taken from the supplier&rsquo;s size sheet for that style. &ldquo;&frac12; chest&rdquo; is the garment measured flat across, so double it for the full circumference. The sheets run to the 140cm size; for 150cm, message us.</p>
       <div className="style-charts">{charted.map((product) => {
         const chart = measurementsFor(product.itemNumber);
         const open = openStyle === product.itemNumber;
@@ -356,7 +356,7 @@ function SizeGuide({ route }) {
               <tbody>{sizeScale.map((size, row) => <tr key={size.key} className={product.sizes.includes(size.key) ? "" : "size-row-unstocked"}>
                 <th scope="row">{size.key}</th>
                 <td>{size.height}cm</td>
-                {chart.columns.map((column, cell) => <td key={column}>{chart.rows[row][cell] ?? "—"}</td>)}
+                {chart.columns.map((column, cell) => <td key={column}>{chart.rows[row]?.[cell] ?? "—"}</td>)}
                 <td>{product.sizes.includes(size.key) ? "Current edit" : "Ask on WhatsApp"}</td>
               </tr>)}</tbody>
             </table>
