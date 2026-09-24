@@ -183,3 +183,68 @@ body{overflow-x:clip}h1,h2,h3{text-wrap:balance}p{text-wrap:pretty}.button{font-
 .desktop-zoom-copy{display:inline}
 .touch-zoom-copy{display:none}
 @media(hover:none){.desktop-zoom-copy{display:none}.touch-zoom-copy{display:inline}}
+
+/* Sale: a wine bar above the store notice, and sale prices set beside the
+   struck-through original wherever a price is shown. */
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.sale-bar{display:flex;align-items:center;justify-content:center;gap:14px;min-height:38px;padding:6px 16px;background:var(--accent);color:#fff;font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;transition:background .2s}
+.sale-bar:hover{background:#612536}
+.sale-bar:focus-visible{outline:2px solid #fff;outline-offset:-4px}
+.sale-bar strong{font-weight:600;letter-spacing:.2em}
+.sale-bar-rule{width:26px;height:1px;background:currentColor;opacity:.6}
+.sale-bar svg{margin-left:-4px;transition:transform .2s}
+.sale-bar:hover svg{transform:translateX(3px)}
+.price{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 9px;margin:9px 0 0;font-size:11px;color:var(--ink);font-variant-numeric:tabular-nums}
+.price-sale{font-size:14px;font-weight:600;color:var(--accent)}
+.price-original{color:var(--muted);text-decoration-thickness:1px}
+.price-off{align-self:center;padding:3px 7px 2px;border:1px solid var(--accent);border-radius:2px;color:var(--accent);font-size:9px;font-weight:600;letter-spacing:.12em;line-height:1.3}
+.pdp-price{margin:0 0 20px;gap:6px 12px;font-size:15px}
+.pdp-price .price-sale{font-size:24px}
+.pdp-price .price-original{font-size:15px}
+.pdp-price .price-off{padding:5px 9px 4px;font-size:10px;background:var(--accent);color:#fff}
+.search-results small.price{margin-top:6px}
+.search-results .price-sale{font-size:12px}
+.cart-item-copy .price{margin:2px 0 0}
+.cart-item-copy .price-sale{font-size:13px}
+@media(max-width:600px){
+  .sale-bar{min-height:32px;gap:10px;font-size:9px;letter-spacing:.16em}
+  .sale-bar-rule{width:18px}
+  .price{gap:3px 7px}
+  .price-sale{font-size:13px}
+  .price-off{font-size:8px;padding:2px 5px 1px}
+  .pdp-price .price-sale{font-size:21px}
+}
+@media(prefers-reduced-motion:reduce){.sale-bar,.sale-bar svg{transition:none}}
+
+/* Not found: the message and its two ways out, then a few pieces to carry on with. */
+.not-found-page{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:7%;align-items:start}
+.not-found-intro{position:sticky;top:130px;padding-top:24px}
+.not-found-intro h1{font-size:clamp(38px,4.4vw,60px);line-height:1.08;margin-bottom:22px}
+.not-found-intro>p:not(.eyebrow){color:var(--muted);font-size:16px;line-height:1.7;max-width:430px}
+.not-found-actions{display:flex;flex-wrap:wrap;gap:12px;margin:34px 0 26px}
+.not-found-actions .button{min-width:170px;justify-content:center}
+.not-found-intro>p.not-found-help{font-size:13px;max-width:none}
+.not-found-help a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.not-found-help a:hover{color:var(--accent)}
+.not-found-suggestions{border-left:1px solid var(--line);padding-left:7%}
+.not-found-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px 20px;margin-top:18px}
+.not-found-grid a{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:var(--ink)}
+.not-found-photo{display:block;aspect-ratio:4/5;background:#fff;overflow:hidden}
+.not-found-photo img{width:100%;height:100%;object-fit:contain;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.not-found-grid a:hover img{transform:scale(1.03)}
+.not-found-grid strong{font-size:13px;font-weight:500;line-height:1.4}
+.not-found-grid .price{margin:0}
+.not-found-grid a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+@media(max-width:900px){
+  .not-found-page{grid-template-columns:1fr;gap:56px}
+  .not-found-intro{position:static;padding-top:0}
+  .not-found-suggestions{border-left:0;border-top:1px solid var(--line);padding:40px 0 0}
+  .not-found-grid{grid-template-columns:repeat(4,1fr)}
+}
+@media(max-width:600px){
+  .not-found-actions{flex-direction:column}
+  .not-found-actions .button{width:100%}
+  .not-found-grid{grid-template-columns:1fr 1fr;gap:22px 14px}
+  .not-found-grid strong{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){.not-found-photo img{transition:none}}
