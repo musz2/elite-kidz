@@ -11,10 +11,13 @@
     "status": "Current edit",
     "featured": true,
     "sizes": [
+      "1Y",
       "2Y",
       "3Y",
       "4Y",
-      "5Y"
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A softly structured blue gingham dress with a floral collar, gathered waist and matching headpiece.",
     "detail": "PDF catalog piece X4991 in blue. Final stock and fit are confirmed directly on WhatsApp before ordering.",
@@ -62,16 +65,21 @@
     "colour": "Natural ivory",
     "status": "Current edit",
     "sizes": [
+      "1Y",
       "2Y",
       "3Y",
       "4Y",
-      "5Y"
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "An ivory collar blouse with softly gathered volume and delicate trim details.",
     "detail": "PDF catalog piece X4992 in beige/ivory. Final stock and fit are confirmed directly on WhatsApp before ordering.",
     "images": [
       "/assets/products/pdf-components/x4992-ivory.jpg"
     ],
+    "video": "/assets/products/blue-dress/product.mp4",
+    "videoLabel": "See the gingham set in motion",
     "alt": "Ivory collar blouse from Elite Kidz",
     "tags": [
       "Girls",
@@ -91,16 +99,21 @@
     "colour": "Powder blue",
     "status": "Current edit",
     "sizes": [
+      "1Y",
       "2Y",
       "3Y",
       "4Y",
-      "5Y"
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A blue gingham blouse with a rounded floral collar and an easy, playful shape.",
     "detail": "PDF catalog piece X4992 in blue. The supplied PDF shows this as a separate colourway from the ivory X4992.",
     "images": [
       "/assets/products/pdf-components/x4992-blue.jpg"
     ],
+    "video": "/assets/products/blue-dress/product.mp4",
+    "videoLabel": "See the gingham set in motion",
     "alt": "Blue gingham blouse from Elite Kidz",
     "tags": [
       "Girls",
@@ -120,16 +133,21 @@
     "colour": "Powder blue",
     "status": "Current edit",
     "sizes": [
+      "1Y",
       "2Y",
       "3Y",
       "4Y",
-      "5Y"
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "Soft blue gingham pants with a relaxed leg and floral details made for movement.",
     "detail": "PDF catalog piece X4993 in blue. Final stock and fit are confirmed directly on WhatsApp before ordering.",
     "images": [
       "/assets/products/pdf-components/x4993-blue.jpg"
     ],
+    "video": "/assets/products/blue-dress/product.mp4",
+    "videoLabel": "See the gingham set in motion",
     "alt": "Blue gingham pants from Elite Kidz",
     "tags": [
       "Girls",
@@ -149,15 +167,34 @@
     "colour": "Pink",
     "status": "Current edit",
     "sizes": [
-      "120cm",
-      "130cm",
-      "140cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A softly printed pink top with a sweet collar and an easy shape for everyday dressing.",
-    "detail": "PDF catalog piece X5010 in pink. The supplied stock sheet shows availability for 120cm, 130cm and 140cm; final confirmation is on WhatsApp.",
+    "detail": "Style X5010 in pink. The supplier lists this style in the sizes shown.",
     "images": [
-      "/assets/products/pdf-5010/product.jpg"
+      "/assets/products/client-september/photo-063.jpg",
+      "/assets/products/client-september/photo-060.jpg",
+      "/assets/products/client-september/photo-061.jpg",
+      "/assets/products/client-september/photo-064.jpg",
+      "/assets/products/client-september/photo-065.jpg",
+      "/assets/products/client-september/photo-067.jpg",
+      "/assets/products/client-september/photo-068.jpg",
+      "/assets/products/client-september/photo-069.jpg",
+      "/assets/products/client-september/photo-070.jpg",
+      "/assets/products/client-september/photo-071.jpg",
+      "/assets/products/client-september/photo-072.jpg",
+      "/assets/products/client-september/photo-073.jpg",
+      "/assets/products/client-september/photo-074.jpg",
+      "/assets/products/client-september/photo-076.jpg",
+      "/assets/products/client-september/photo-077.jpg"
     ],
+    "video": "/assets/products/client-september/pink-collection.mp4",
+    "videoLabel": "See the pink edit in motion",
     "alt": "Pink floral collar top from Elite Kidz",
     "tags": [
       "Girls",
@@ -177,13 +214,34 @@
     "colour": "Natural ivory",
     "status": "Current edit",
     "sizes": [
-      "120cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "Light ivory shorts finished with delicate embroidered flowers and a softly tailored shape.",
-    "detail": "PDF catalog piece X5011 in beige. The supplied stock sheet shows availability for 120cm; final confirmation is on WhatsApp.",
+    "detail": "Style X5011 in beige. The supplier lists this style in the sizes shown.",
     "images": [
-      "/assets/products/pdf-5011/product.jpg"
+      "/assets/products/client-september/photo-066.jpg",
+      "/assets/products/client-september/photo-075.jpg",
+      "/assets/products/client-september/photo-079.jpg",
+      "/assets/products/client-september/photo-060.jpg",
+      "/assets/products/client-september/photo-061.jpg",
+      "/assets/products/client-september/photo-063.jpg",
+      "/assets/products/client-september/photo-064.jpg",
+      "/assets/products/client-september/photo-067.jpg",
+      "/assets/products/client-september/photo-068.jpg",
+      "/assets/products/client-september/photo-069.jpg",
+      "/assets/products/client-september/photo-070.jpg",
+      "/assets/products/client-september/photo-071.jpg",
+      "/assets/products/client-september/photo-072.jpg",
+      "/assets/products/client-september/photo-073.jpg",
+      "/assets/products/client-september/photo-077.jpg"
     ],
+    "video": "/assets/products/client-september/pink-collection.mp4",
+    "videoLabel": "See the pink edit in motion",
     "alt": "Ivory embroidered flower shorts from Elite Kidz",
     "tags": [
       "Girls",
@@ -203,15 +261,31 @@
     "colour": "Pink",
     "status": "Current edit",
     "sizes": [
-      "120cm",
-      "130cm",
-      "140cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A charming pink floral dress with a rounded collar and a gently gathered silhouette.",
-    "detail": "PDF catalog piece X5008 in pink. The supplied stock sheet shows availability for 120cm, 130cm and 140cm; final confirmation is on WhatsApp.",
+    "detail": "Style X5008 in pink. The supplier lists this style in the sizes shown.",
     "images": [
-      "/assets/products/pdf-5008/product.jpg"
+      "/assets/products/client-september/photo-059.jpg",
+      "/assets/products/client-september/photo-062.jpg",
+      "/assets/products/client-september/photo-078.jpg",
+      "/assets/products/client-september/photo-095.jpg",
+      "/assets/products/client-september/photo-096.jpg",
+      "/assets/products/client-september/photo-098.jpg",
+      "/assets/products/client-september/photo-099.jpg",
+      "/assets/products/client-september/photo-100.jpg",
+      "/assets/products/client-september/photo-101.jpg",
+      "/assets/products/client-september/photo-102.jpg",
+      "/assets/products/client-september/photo-103.jpg",
+      "/assets/products/client-september/photo-107.jpg"
     ],
+    "video": "/assets/products/client-september/pink-collection.mp4",
+    "videoLabel": "See the pink edit in motion",
     "alt": "Pink floral collar dress from Elite Kidz",
     "tags": [
       "Girls",
@@ -231,14 +305,35 @@
     "colour": "Pink",
     "status": "Current edit",
     "sizes": [
-      "120cm",
-      "130cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A softly detailed pink floral dress with ruffle sleeves and a pretty bib-style collar.",
-    "detail": "PDF catalog piece X5009 in pink. The supplied stock sheet shows availability for 120cm and 130cm; final confirmation is on WhatsApp.",
+    "detail": "Style X5009 in pink. The supplier lists this style in the sizes shown.",
     "images": [
-      "/assets/products/pdf-5009/product.jpg"
+      "/assets/products/client-september/photo-083.jpg",
+      "/assets/products/client-september/photo-080.jpg",
+      "/assets/products/client-september/photo-081.jpg",
+      "/assets/products/client-september/photo-082.jpg",
+      "/assets/products/client-september/photo-084.jpg",
+      "/assets/products/client-september/photo-085.jpg",
+      "/assets/products/client-september/photo-086.jpg",
+      "/assets/products/client-september/photo-087.jpg",
+      "/assets/products/client-september/photo-088.jpg",
+      "/assets/products/client-september/photo-089.jpg",
+      "/assets/products/client-september/photo-090.jpg",
+      "/assets/products/client-september/photo-091.jpg",
+      "/assets/products/client-september/photo-092.jpg",
+      "/assets/products/client-september/photo-093.jpg",
+      "/assets/products/client-september/photo-094.jpg",
+      "/assets/products/client-september/photo-097.jpg"
     ],
+    "video": "/assets/products/client-september/pink-collection.mp4",
+    "videoLabel": "See the pink edit in motion",
     "alt": "Pink floral ruffle bib dress from Elite Kidz",
     "tags": [
       "Girls",
@@ -259,16 +354,16 @@
     "status": "New arrival",
     "featured": true,
     "sizes": [
-      "90cm",
-      "100cm",
-      "110cm",
-      "120cm",
-      "130cm",
-      "140cm",
-      "150cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y",
+      "8Y"
     ],
     "description": "An airy ivory dress with a hand-finished floral collar, flutter sleeves and gentle movement.",
-    "detail": "Client-supplied piece X5671 in ivory. The source size chart runs from 90cm to 150cm; final stock and fit are confirmed on WhatsApp.",
+    "detail": "Client-supplied piece X5671 in ivory. The supplier lists this style from 2Y to 8Y (90–150cm); final stock and fit are confirmed on WhatsApp.",
     "images": [
       "/assets/products/red-ivory/source/source-09.jpg",
       "/assets/products/red-ivory/source/source-11.jpg",
@@ -321,16 +416,16 @@
     "colour": "Natural ivory",
     "status": "New arrival",
     "sizes": [
-      "90cm",
-      "100cm",
-      "110cm",
-      "120cm",
-      "130cm",
-      "140cm",
-      "150cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y",
+      "8Y"
     ],
     "description": "A breezy sleeveless top with floral embroidery and a soft, easy drape.",
-    "detail": "Client-supplied piece X5396 in ivory. The source size chart runs from 90cm to 150cm; final stock and fit are confirmed on WhatsApp.",
+    "detail": "Client-supplied piece X5396 in ivory. The supplier lists this style from 2Y to 8Y (90–150cm); final stock and fit are confirmed on WhatsApp.",
     "images": [
       "/assets/products/red-ivory/source/source-08.jpg",
       "/assets/products/red-ivory/source/source-11.jpg",
@@ -384,16 +479,16 @@
     "status": "New arrival",
     "featured": true,
     "sizes": [
-      "90cm",
-      "100cm",
-      "110cm",
-      "120cm",
-      "130cm",
-      "140cm",
-      "150cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y",
+      "8Y"
     ],
     "description": "A joyful red cotton dress with a floral collar, flutter sleeves and softly gathered tiers.",
-    "detail": "Client-supplied piece X5672 in red. The source size chart runs from 90cm to 150cm; final stock and fit are confirmed on WhatsApp.",
+    "detail": "Client-supplied piece X5672 in red. The supplier lists this style from 2Y to 8Y (90–150cm); final stock and fit are confirmed on WhatsApp.",
     "images": [
       "/assets/products/red-ivory/source/source-07.jpg",
       "/assets/products/red-ivory/source/source-11.jpg",
@@ -445,16 +540,16 @@
     "colour": "Natural ivory",
     "status": "New arrival",
     "sizes": [
-      "90cm",
-      "100cm",
-      "110cm",
-      "120cm",
-      "130cm",
-      "140cm",
-      "150cm"
+      "2Y",
+      "3Y",
+      "4Y",
+      "5Y",
+      "6Y",
+      "7Y",
+      "8Y"
     ],
     "description": "Light, wide-leg cotton pants with tiny floral embroidery and an easy shape made for movement.",
-    "detail": "Client-supplied piece X5673 in ivory. The source size chart runs from 90cm to 150cm; final stock and fit are confirmed on WhatsApp.",
+    "detail": "Client-supplied piece X5673 in ivory. The supplier lists this style from 2Y to 8Y (90–150cm); final stock and fit are confirmed on WhatsApp.",
     "images": [
       "/assets/products/red-ivory/source/source-10.jpg",
       "/assets/products/red-ivory/source/source-11.jpg",
@@ -508,10 +603,13 @@
     "status": "Current edit",
     "featured": true,
     "sizes": [
+      "1Y",
       "2Y",
       "3Y",
       "4Y",
-      "5Y"
+      "5Y",
+      "6Y",
+      "7Y"
     ],
     "description": "A softly gathered sage dress with appliqué tulips, wide shoulder straps and a ruffled hem.",
     "detail": "PDF catalog piece X5014 in beige/sage. Final stock and fit are confirmed directly on WhatsApp before ordering.",

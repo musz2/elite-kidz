@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { products } from '../src/data/products.js';
 import { galleryImages, imagePreview } from '../src/media.js';
+import { priceFor } from '../src/data/prices.js';
 const { chromium }=await import(process.env.PLAYWRIGHT_MODULE || '/opt/homebrew/lib/node_modules/playwright/index.mjs');
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE || '/Users/mustafa/Library/Caches/ms-playwright/chromium_headless_shell-1243/chrome-headless-shell-mac-arm64/chrome-headless-shell'});
 const origin=process.env.TEST_ORIGIN || 'http://localhost:3000';
@@ -37,18 +38,25 @@ try{
  assert.equal(products.length,16);assert.equal(new Set(products.map(p=>p.id)).size,16);
  for(const product of products){
   assert.ok(product.sizes.length);assert.ok(!('price' in product));
+  const price=priceFor(product);assert.ok(price,`${product.slug} has a sale price`);assert.equal(price.original,price.sale*2,`${product.slug} is 50% off`);
   for(const src of galleryImages(product)){
    assert.ok(fs.existsSync('public'+src),src);
    for(const width of [160,480,960])assert.ok(fs.existsSync('public'+imagePreview(src,width)));
   }
  }
- results.push('Original 13 product records unchanged; 3 sourced additions; all gallery assets and derivatives exist.');
+ results.push('Original 13 product records unchanged; 3 sourced additions; every piece priced at 50% off; all gallery assets and derivatives exist.');
  for(const route of ['', 'shop', ...products.map(p=>'product/'+p.slug),'about','contact','faq','size-guide','shipping-returns','missing-route','product/missing']){
   await go(route);assert.equal(await page.locator('h1').count(),1,route);
   if(route.startsWith('product/') && route!=='product/missing')await decoded();
  }
- results.push('All 16 PDPs, all supporting routes, and missing-route states render.');
- for(const width of [1440,1280,1024]){
+ // A mistyped product link lands on the not-found page, with both ways out working.
+ await go('product/missing');assert.match(await page.locator('.not-found-intro .eyebrow').innerText(),/product not found/i);assert.equal(await page.title(),'Product not found — Elite Kidz');
+ await page.getByRole('link',{name:'Back to shop'}).click();await page.waitForURL('**/#/shop');await page.locator('.shop-page').waitFor();
+ await go('missing-route');assert.match(await page.locator('.not-found-intro .eyebrow').innerText(),/page not found/i);
+ await page.getByRole('link',{name:'Go home'}).click();await page.waitForURL(/#\/$/);await page.locator('.fashion-hero').waitFor();
+ results.push('All 16 PDPs, all supporting routes, and the not-found page (with Back to shop / Go home) render.');
+ // The side panel needs 1100px and a fine pointer; narrower windows magnify inside the stage.
+ for(const width of [1440,1280]){
   await page.setViewportSize({width,height:1000});
   for(const slug of ['blue-gingham-dress-x4991','red-ruffle-dress-x5672','pink-floral-top-x5010','ivory-tulip-dress-x5014']){
    await go('product/'+slug);await decoded();
@@ -65,32 +73,40 @@ try{
    }
   }
  }
- results.push('Magnifier: 60 corner/center checks and 156 sweep samples pass across 3 widths and 4 image shapes; thumbnail switching and route remounts pass.');
+ await page.setViewportSize({width:1024,height:1000});
+ for(const slug of ['blue-gingham-dress-x4991','red-ruffle-dress-x5672']){
+  await go('product/'+slug);await decoded();const r=await photoRect();await page.mouse.move(r.x+r.w*.5,r.y+r.h*.5);await page.waitForTimeout(160);
+  assert.equal(await page.locator('.zoom-preview.is-active').count(),0,'no side panel below 1100px');
+  const scale=await page.locator('.product-stage.is-magnified .primary-photograph').evaluate(img=>new DOMMatrix(getComputedStyle(img).transform).a);assert.ok(scale>1,'photo magnifies in place at 1024px');
+  await page.mouse.move(20,150);await page.waitForTimeout(150);assert.equal(await page.locator('.product-stage.is-magnified').count(),0,'in-place zoom resets on leave');
+ }
+ results.push('Magnifier: 40 corner/center checks and 104 sweep samples pass across 2 panel widths and 4 image shapes; in-place zoom at 1024px; thumbnail switching and route remounts pass.');
  // Resize while zooming and confirm calculations are rebuilt on the next movement.
  await page.setViewportSize({width:1280,height:900});await decoded();let r=await photoRect();await page.mouse.move(r.x+r.w*.6,r.y+r.h*.6);await validateZoom();
  await page.setViewportSize({width:1440,height:1000});await decoded();r=await photoRect();await page.mouse.move(r.x+r.w*.4,r.y+r.h*.4);await validateZoom();
  await go('shop');await page.getByRole('button',{name:'Tops',exact:true}).click();assert.equal(await page.locator('.product-card').count(),5);
- await page.getByLabel('Filter by size').selectOption('1-2Y');assert.equal(await page.locator('.product-card').count(),1);
+ await page.getByLabel('Filter by size').selectOption('1Y');assert.equal(await page.locator('.product-card').count(),3);
  await page.getByLabel('Filter by colour').selectOption('Pink');assert.equal(await page.locator('.product-card').count(),0);
  await page.getByRole('button',{name:'Clear filters',exact:true}).click();assert.equal(await page.locator('.product-card').count(),16);
  await page.getByRole('button',{name:'Search products',exact:true}).click();await page.getByLabel('Search the collection',{exact:true}).fill('LX0063');assert.equal(await page.locator('.search-results>a').count(),1);
  await page.locator('.search-results>a').click();await page.waitForURL('**/#/product/sage-babydoll-blouse-lx0063');assert.equal(await page.locator('.search-dialog').count(),0);
  assert.ok(await page.getByRole('button',{name:'Select a size to add'}).isDisabled());
- await page.getByRole('button',{name:'1-2Y',exact:true}).click();await page.getByRole('button',{name:'Increase quantity',exact:true}).click();await page.getByRole('button',{name:'Add to bag',exact:true}).click();
+ assert.match(await page.locator('.pdp-price').innerText(),/₹599[\s\S]*₹1,198[\s\S]*50% OFF/);
+ await page.getByRole('button',{name:'Size 1Y, for a height of 80cm',exact:true}).click();await page.getByRole('button',{name:'Increase quantity',exact:true}).click();await page.getByRole('button',{name:'Add to bag',exact:true}).click();
  assert.ok(await page.locator('.drawer-layer').evaluate(d=>d.open));assert.match(await page.locator('.cart-item').innerText(),/Sage Sleeveless Babydoll Blouse/);
  for(let n=0;n<10;n++){await page.keyboard.press('Tab');assert.ok(await page.evaluate(()=>document.querySelector('.drawer-layer').contains(document.activeElement)));}
  await page.locator('.cart-item').getByRole('button',{name:'Increase quantity'}).click();assert.equal(await page.locator('.cart-item .quantity-control span').innerText(),'3');
  await page.keyboard.press('Escape');await page.reload();await page.getByRole('button',{name:'Open bag, 3 items'}).click();assert.equal(await page.locator('.cart-item .quantity-control span').innerText(),'3');
  await page.addInitScript(()=>{window.open=(url)=>{window.__orderUrl=url;return null;};});await page.reload();await page.getByRole('button',{name:'Open bag, 3 items'}).click();
- await page.getByRole('button',{name:'Enquire on WhatsApp'}).click();const order=await page.evaluate(()=>window.__orderUrl);assert.match(decodeURIComponent(order),/LX0063/);assert.match(decodeURIComponent(order),/Size: 1-2Y/);assert.match(decodeURIComponent(order),/Qty: 3/);
+ await page.getByRole('button',{name:'Enquire on WhatsApp'}).click();const order=await page.evaluate(()=>window.__orderUrl);assert.match(decodeURIComponent(order),/LX0063/);const text=new URL(order).searchParams.get('text');assert.match(text,/Size: 1Y · 80cm/);assert.match(text,/Qty: 3/);assert.match(text,/Price: ₹599 \(50% off, was ₹1,198\)/);assert.match(text,/Subtotal: ₹1,797/);
  await page.getByRole('button',{name:'Remove',exact:true}).click();assert.ok(await page.getByText('Your bag is waiting.').isVisible());await page.keyboard.press('Escape');
  // Add every new item through quick add, using only its real supplied sizes.
  for(const product of products.slice(13)){
   await go('shop');const card=page.locator('.product-card').filter({has:page.getByRole('heading',{name:product.name,exact:true})});
-  await card.getByRole('button',{name:'Quick add '+product.name,exact:true}).click();await card.getByRole('button',{name:'2-3Y',exact:true}).click();await page.keyboard.press('Escape');
+  await card.getByRole('button',{name:'Quick add '+product.name,exact:true}).click();await card.locator('.quick-sizes').getByRole('button',{name:/^2Y/}).click();await page.keyboard.press('Escape');
  }
  await page.getByRole('button',{name:'Open bag, 3 items'}).click();assert.equal(await page.locator('.cart-item').count(),3);await page.screenshot({animations:'disabled',path:'work/qa/bag-verified.png'});await page.keyboard.press('Escape');
- results.push('Search, combined filters, all new quick-add items, real sizes, quantities, removal, persistence, focus trap, and WhatsApp enquiry payload pass. No message sent.');
+ results.push('Search, combined filters, sale prices, all new quick-add items, real sizes, quantities, removal, persistence, focus trap, and WhatsApp enquiry payload with prices pass. No message sent.');
  for(const width of [1440,1280,1024,768,430,390,375]){
   await page.setViewportSize({width,height:900});
   for(const route of ['','shop','product/ivory-tulip-dress-x5014','size-guide']){
@@ -98,14 +114,17 @@ try{
   }
  }
  const touch=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:2});const mobile=await touch.newPage();monitor(mobile);
- await go('product/ivory-tulip-dress-x5014',mobile);await decoded(mobile);await mobile.getByRole('button',{name:'Expand Ivory Tulip Dress photograph'}).tap();assert.ok(await mobile.locator('.image-viewer').evaluate(d=>d.open));assert.equal(await mobile.locator('.zoom-preview.is-active').count(),0);
+ await go('product/ivory-tulip-dress-x5014',mobile);await decoded(mobile);await mobile.getByRole('button',{name:'Open Ivory Tulip Dress photograph full screen'}).tap();assert.ok(await mobile.locator('.image-viewer').evaluate(d=>d.open));assert.equal(await mobile.locator('.zoom-preview.is-active').count(),0);
  await mobile.getByRole('button',{name:'+ Zoom in',exact:true}).tap();assert.ok(await mobile.locator('.viewer-viewport').evaluate(el=>el.scrollWidth>el.clientWidth && el.scrollHeight>el.clientHeight));
  const cdp=await touch.newCDPSession(mobile);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:190,y:400}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:90,y:210}]});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  await mobile.waitForTimeout(250);const pan=await mobile.locator('.viewer-viewport').evaluate(el=>({x:el.scrollLeft,y:el.scrollTop}));assert.ok(pan.x>0 && pan.y>0);await mobile.screenshot({animations:'disabled',path:'work/qa/mobile-zoom.png'});
  await mobile.getByRole('button',{name:'Next image',exact:true}).tap();assert.equal(await mobile.locator('.viewer-viewport.is-zoomed').count(),0);await mobile.getByRole('button',{name:'Close image viewer'}).tap();assert.equal(await mobile.locator('.image-viewer').count(),0);
  await mobile.getByRole('button',{name:'Open menu',exact:true}).tap();await mobile.locator('.main-nav').getByRole('link',{name:'Dresses',exact:true}).tap();await mobile.waitForURL('**/#/shop?type=Dress');await mobile.locator('.shop-page').waitFor();assert.equal(await mobile.locator('.product-card').count(),7);
  await mobile.getByRole('button',{name:'Search products',exact:true}).tap();await mobile.getByLabel('Search the collection',{exact:true}).fill('X5013');await mobile.screenshot({animations:'disabled',path:'work/qa/mobile-search.png'});assert.equal(await mobile.locator('.search-results>a').count(),1);await mobile.getByRole('button',{name:'Close search',exact:true}).tap();
- await page.emulateMedia({reducedMotion:'reduce'});await go('');assert.equal(await page.locator('.fashion-hero-images').evaluate(e=>getComputedStyle(e).animationName),'none');
+ // The ticker loops seamlessly (each half is wider than the screen) and holds still under reduced motion.
+ await go('');const halves=await page.locator('.ticker-half').evaluateAll(h=>h.map(x=>x.getBoundingClientRect().width));assert.equal(halves.length,2);assert.equal(halves[0],halves[1]);assert.ok(halves[0]>=page.viewportSize().width);
+ assert.equal(await page.locator('.ticker a:not([tabindex="-1"])').count(),2,'one focusable sale link and one WhatsApp link');
+ await page.emulateMedia({reducedMotion:'reduce'});await go('');assert.equal(await page.locator('.ticker-track').evaluate(e=>getComputedStyle(e).animationName),'none');assert.equal(await page.locator('.fashion-hero-images').evaluate(e=>getComputedStyle(e).animationName),'none');
  results.push('Seven responsive widths pass; touch gallery expands, zooms, pans by touch, switches photos and closes; mobile menu/search and reduced motion pass.');
  assert.deepEqual(errors,[],'browser errors');results.push('No browser console errors or uncaught exceptions.');
  console.log(results.join('\n'));fs.writeFileSync('work/qa/test-results.json',JSON.stringify({passed:true,results,errors},null,2));
