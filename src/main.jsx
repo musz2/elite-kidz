@@ -68,8 +68,15 @@ function createWhatsAppUrl(items, directProduct, directSize, directQuantity) {
     if (item.product.itemNumber) lines.push(`Style: ${item.product.itemNumber}`);
     lines.push(`Size: ${item.size ? formatSize(item.size) : "To confirm on WhatsApp"}`);
     lines.push(`Qty: ${item.quantity}`);
+    const price = priceFor(item.product);
+    if (price) {
+      lines.push(`Price: ${formatRupees(price.sale)} (${SALE_PERCENT}% off, was ${formatRupees(price.original)})`);
+      if (item.quantity > 1) lines.push(`Subtotal: ${formatRupees(price.sale * item.quantity)}`);
+    }
     lines.push("");
   });
+  const total = list.reduce((sum, item) => sum + (priceFor(item.product)?.sale ?? 0) * item.quantity, 0);
+  if (total && list.length > 1) lines.push(`Total: ${formatRupees(total)}`, "");
   lines.push("Please confirm size availability and order details.");
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
 }
