@@ -93,6 +93,25 @@ function Price({ product, className = "", as: Tag = "p" }) {
   </Tag>;
 }
 
+// One bar across the top: the sale and WhatsApp ordering, looping left to right.
+// Two identical halves slide by exactly one half so the loop never jumps; only
+// the first pair is reachable by keyboard and screen reader.
+const TICKER_REPEATS = 6;
+function AnnouncementTicker() {
+  const half = (copy) => Array.from({ length: TICKER_REPEATS }, (_, index) => {
+    const hidden = copy > 0 || index > 0;
+    return <span className="ticker-pair" key={index} aria-hidden={hidden || undefined}>
+      <a href="#/shop" tabIndex={hidden ? -1 : undefined} onClick={(event) => handleInternalNavigation(event, "shop")}><span className="ticker-live" aria-hidden="true" />Sale is live <span className="ticker-dash" aria-hidden="true">—</span> <strong>{SALE_PERCENT}% off</strong></a>
+      <span className="ticker-star" aria-hidden="true">✳</span>
+      <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer" tabIndex={hidden ? -1 : undefined}>WhatsApp ordering</a>
+      <span className="ticker-star" aria-hidden="true">✳</span>
+    </span>;
+  });
+  return <div className="ticker" role="region" aria-label="Store announcements">
+    <div className="ticker-track"><div className="ticker-half">{half(0)}</div><div className="ticker-half" aria-hidden="true">{half(1)}</div></div>
+  </div>;
+}
+
 function Header({ cartCount, onOpenCart, onOpenSearch }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const header = useRef(null);
@@ -102,8 +121,7 @@ function Header({ cartCount, onOpenCart, onOpenSearch }) {
   const toggleMenu = () => { if (!menuOpen) setNavTop(Math.max(0, header.current.getBoundingClientRect().bottom)); setMenuOpen((open) => !open); };
   useEffect(() => { if(!menuOpen) return; const old=document.body.style.overflow; document.body.style.overflow='hidden'; const close=e=>{if(e.key==='Escape')setMenuOpen(false);}; const resize=()=>{if(innerWidth>820)setMenuOpen(false);}; window.addEventListener('keydown',close);window.addEventListener('resize',resize); return ()=>{document.body.style.overflow=old;window.removeEventListener('keydown',close);window.removeEventListener('resize',resize);}; },[menuOpen]);
   return <>
-    <a className="sale-bar" href="#/shop" onClick={(event) => handleInternalNavigation(event, "shop")}><span>Sale is live</span><span className="sale-bar-rule" aria-hidden="true" /><strong>{SALE_PERCENT}% off</strong><Icon name="arrow" size={14} /></a>
-    <div className="announcement"><span>WhatsApp ordering</span><span className="announcement-dot">·</span><span>New Mallepally, Hyderabad</span><a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noreferrer">Chat with us <Icon name="arrow" size={14} /></a></div>
+    <AnnouncementTicker />
     <header ref={header} className="site-header" onKeyDown={menuOpen ? trapDialogFocus : undefined}>
       <button className="mobile-menu" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={toggleMenu}><Icon name={menuOpen ? "close" : "menu"} /></button>
       <a className="brand-lockup" href="#/" onClick={(event) => handleInternalNavigation(event, "", () => setMenuOpen(false))} aria-label="Elite Kidz home">
