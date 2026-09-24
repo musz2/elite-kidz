@@ -60,7 +60,7 @@ body{overflow-x:clip}h1,h2,h3{text-wrap:balance}p{text-wrap:pretty}.button{font-
    Every chapter's photograph is stacked in the frame and cross-faded, so the
    still always shows the piece the film is on — no blank frame between looks. */
 .hero-detail-frame{display:block;position:relative;width:100%;aspect-ratio:3/4;overflow:hidden;background:var(--paper-2);padding:0}
-.hero-detail-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s ease}
+.hero-detail-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .22s ease-out}
 .hero-detail-frame img.is-active{opacity:1}
 .hero-detail-note{display:block;font-size:9px;padding:11px 3px 5px;text-align:center;animation:tag-in .34s ease-out}
 @media(prefers-reduced-motion:reduce){.hero-detail-frame img{transition:none}.hero-detail-note{animation:none}}

@@ -177,15 +177,16 @@ function ProductCard({ product, onQuickAsk, onAdd }) {
   </article>;
 }
 
-// Which piece is on screen, second by second, read off the cut itself. The
-// caption follows the film so the shopper can open whatever caught their eye.
+// Which piece is on screen, read off the film's own hard cuts (ffmpeg scene
+// detection on highlight.mp4, 30fps). The still and caption switch on these
+// exact frames, so they must move with the edit if the film is ever recut.
 const HERO_CHAPTERS = [
   { from: 0, slug: "blue-gingham-dress-x4991", note: "Bunnies and gingham" },
-  { from: 6, slug: "ivory-floral-collar-dress-x5671", note: "A hand-finished collar" },
-  { from: 9, slug: "red-ruffle-dress-x5672", note: "A little red joy" },
-  { from: 11.2, slug: "pink-floral-collar-dress-x5008", note: "Pink, out in the field" },
-  { from: 16.2, slug: "ivory-tulip-dress-x5014", note: "Tulips, stitched on" },
-  { from: 19.2, slug: "sage-tulip-dress-x5014", note: "A little green, a lot of joy" }
+  { from: 5.967, slug: "ivory-floral-collar-dress-x5671", note: "A hand-finished collar" },
+  { from: 9.3, slug: "red-ruffle-dress-x5672", note: "A little red joy" },
+  { from: 10.7, slug: "pink-floral-collar-dress-x5008", note: "Pink, out in the field" },
+  { from: 16, slug: "ivory-tulip-dress-x5014", note: "Tulips, stitched on" },
+  { from: 19.4, slug: "sage-tulip-dress-x5014", note: "A little green, a lot of joy" }
 ];
 
 function chapterAt(time) {
@@ -224,6 +225,22 @@ function HeroFilm({ chapter, onChapter }) {
     observer.observe(el);
     return () => observer.disconnect();
   }, [reduced]);
+  // timeupdate only fires every ~250ms, which lets the still trail the cut.
+  // Follow each presented frame instead, or every animation frame as a fallback.
+  const onChapterRef = useRef(onChapter);
+  onChapterRef.current = onChapter;
+  useEffect(() => {
+    const el = video.current;
+    if (!el) return;
+    let handle;
+    const perFrame = typeof el.requestVideoFrameCallback === "function";
+    const tick = (_now, frame) => {
+      onChapterRef.current(chapterAt(frame?.mediaTime ?? el.currentTime));
+      handle = perFrame ? el.requestVideoFrameCallback(tick) : requestAnimationFrame(tick);
+    };
+    handle = perFrame ? el.requestVideoFrameCallback(tick) : requestAnimationFrame(tick);
+    return () => perFrame ? el.cancelVideoFrameCallback(handle) : cancelAnimationFrame(handle);
+  }, []);
   const piece = getProduct(HERO_CHAPTERS[chapter].slug);
   const toggle = () => {
     const el = video.current;
@@ -235,7 +252,7 @@ function HeroFilm({ chapter, onChapter }) {
     <video ref={video} className="hero-film-video" src={source.src} poster={source.poster}
       muted loop playsInline autoPlay={!reduced} preload={reduced ? "none" : "auto"}
       disablePictureInPicture onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
-      onTimeUpdate={(event) => onChapter(chapterAt(event.currentTarget.currentTime))}
+      onSeeked={(event) => onChapter(chapterAt(event.currentTarget.currentTime))}
       aria-label="Elite Kidz collection film — the blue gingham, ivory embroidery, pink floral and sage tulip edits" />
     <a className="hero-film-caption" href={`#/product/${piece.slug}`} onClick={(event) => handleInternalNavigation(event, `product/${piece.slug}`)}>
       <span className="hero-film-tag" key={piece.slug}><small>Now playing</small><strong>{piece.name}</strong></span>
