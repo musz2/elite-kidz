@@ -1,6 +1,10 @@
 // Google Ads conversion tracking, checked against the real Google tag in a browser.
 //   npm run build && npm start   (in another terminal)
 //   node tests/conversions.mjs   (needs internet; set PLAYWRIGHT_MODULE / CHROMIUM_EXECUTABLE if needed)
+//   BLOCK_CONVERSIONS=1 TEST_ORIGIN=https://elitekidzs.com node tests/conversions.mjs
+//     checks the live site without sending test conversions to Google Ads: the browser
+//     cannot resolve Google's measurement hosts (the tag itself still loads), so requests
+//     are counted as the page makes them but never arrive.
 //
 // Google sends each conversion event to several endpoints (googleadservices, doubleclick,
 // google.com, google.co.in), so a conversion is counted twice over: the primary hit to
@@ -12,7 +16,13 @@
 import assert from "node:assert/strict";
 
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || "/opt/homebrew/lib/node_modules/playwright/index.mjs");
-const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}) });
+// Beacons cannot be intercepted by page.route, so blocking is done at name resolution.
+const BLOCKED_HOSTS = ["www.googleadservices.com", "googleads.g.doubleclick.net", "www.google.com", "www.google.co.in"];
+const browser = await chromium.launch({
+  headless: true,
+  ...(process.env.CHROMIUM_EXECUTABLE ? { executablePath: process.env.CHROMIUM_EXECUTABLE } : {}),
+  ...(process.env.BLOCK_CONVERSIONS ? { args: [`--host-resolver-rules=${BLOCKED_HOSTS.map((host) => `MAP ${host} ~NOTFOUND`).join(", ")}`] } : {})
+});
 const origin = process.env.TEST_ORIGIN || "http://localhost:3000";
 const LABELS = { whatsapp: "ZF84CJzg9pgdEJzS1vhE", call: "lFZgCNrW9ZgdEJzS1vhE" };
 const WHATSAPP = "https://wa.me/917702426007";
@@ -23,7 +33,8 @@ async function open(context) {
   const hits = { whatsapp: 0, call: 0, tagLoads: 0, configHits: 0 };
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+  page.on("console", (m) => { if (m.type() === "error" && !(process.env.BLOCK_CONVERSIONS && /ERR_NAME_NOT_RESOLVED/.test(m.text()))) errors.push(m.text()); });
+  if (process.env.BLOCK_CONVERSIONS) page.on("requestfinished", (request) => { if (BLOCKED_HOSTS.includes(new URL(request.url()).hostname)) errors.push(`reached Google: ${request.url().slice(0, 80)}`); });
   page.on("request", (request) => {
     const payload = request.url() + " " + (request.postData() || "");
     const primary = request.url().startsWith("https://www.googleadservices.com/pagead/conversion/18506688796/");
