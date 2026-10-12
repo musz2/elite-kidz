@@ -3,12 +3,12 @@
 // Google supplies one `gtag_report_conversion(url)` snippet per conversion action, and both
 // use that same function name, so each action has its own function here instead. The
 // snippets' `url`/event_callback redirect is not used:
-// - Ask Price opens WhatsApp in a new tab, which browsers only allow during the click itself,
-//   so it cannot wait for Google's callback.
+// - WhatsApp opens in a new tab, which browsers only allow during the click itself, so it
+//   cannot wait for Google's callback.
 // - A tel: link opens the dialler without leaving the page.
 // The hit is sent with the beacon transport, so it is delivered even when the browser
 // switches to WhatsApp or the phone app straight away.
-const ASK_PRICE = "AW-18506688796/ZF84CJzg9pgdEJzS1vhE"; // "Outbound click" action
+const WHATSAPP = "AW-18506688796/ZF84CJzg9pgdEJzS1vhE"; // "Outbound click" action
 const CLICK_TO_CALL = "AW-18506688796/lFZgCNrW9ZgdEJzS1vhE"; // "Click to call" action
 
 function reportConversion(sendTo) {
@@ -16,8 +16,8 @@ function reportConversion(sendTo) {
   window.gtag("event", "conversion", { send_to: sendTo, value: 1.0, currency: "INR", transport_type: "beacon" });
 }
 
-/** A product page's Ask Price enquiry button was clicked. */
-export const reportAskPrice = () => reportConversion(ASK_PRICE);
+/** Any WhatsApp button or link was clicked: Ask Price, a product card, the bag, or a contact link. */
+export const reportWhatsApp = () => reportConversion(WHATSAPP);
 
 /** A telephone link was clicked. */
 export const reportCall = () => reportConversion(CLICK_TO_CALL);
